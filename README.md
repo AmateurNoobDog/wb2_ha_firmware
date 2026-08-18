@@ -72,7 +72,7 @@ cd <SDK>/tools/flash_tool
 
 响应示例(开关):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"sw","name":"智能开关","model":"WB2",
+{"mac":"AC:D8:29:7A:60:5D","type":"sw","name":"智能开关","model":"Ai-WB2-12F",
  "count":3,"names":["开关1","开关2","开关3"],
  "on":0,"on1":0,"on2":0}
 ```

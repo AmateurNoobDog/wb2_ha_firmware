@@ -6,13 +6,15 @@
 #include "ha_json.h"
 #include "led_handler.h"
 #include "led.h"
+#include "app_config.h"
 
 int led_handler_get_state(char *buf, int buf_len)
 {
     uint8_t r, g, b;
 
     led_get_state(&r, &g, &b);
-    return snprintf(buf, buf_len, "\"r\":%d,\"g\":%d,\"b\":%d", r, g, b);
+    return snprintf(buf, buf_len, "\"model\":\"%s\",\"r\":%d,\"g\":%d,\"b\":%d",
+                    DEVICE_MODEL, r, g, b);
 }
 
 int led_handler_set_state(const char *cmd_json)

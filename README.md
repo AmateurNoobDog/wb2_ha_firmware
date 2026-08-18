@@ -22,13 +22,15 @@ applications/home_assistant/
 
 ## 使用方法
 
-### 1. 放置到 SDK
+### 1. 获取 SDK 并放置代码
 
-把 `applications/home_assistant/` 整体放入 Ai-Thinker-WB2 SDK:
+基于官方 [Ai-Thinker-WB2 SDK](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2):
 
-```
-cd <Ai-Thinker-WB2>
+```bash
+git clone --recursive https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2.git
+cd Ai-Thinker-WB2
 # 将本仓库的 applications/home_assistant 复制到 SDK 的 applications/ 下
+cp -r <本仓库路径>/applications/home_assistant applications/
 ```
 
 ### 2. 编译

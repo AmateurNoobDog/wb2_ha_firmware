@@ -11,7 +11,6 @@ applications/home_assistant/
 ├── ha_lib/     # 共享库:设备无关的 TCP JSON 服务器 + JSON 解析器
 ├── light/      # RGB 彩灯固件(3 路 PWM,设备类型 wb2)
 └── switch/     # 3 路智能开关固件(GPIO 继电器,设备类型 sw)
-tools/          # 烧录/重启辅助工具(mqtt_ctl.py)
 ```
 
 ### ha_lib(共享组件)
@@ -44,14 +43,7 @@ make -j4
 
 ### 3. 烧录
 
-方式一(需 MQTT 控制服务,见 `tools/mqtt_ctl.py`):
-
-```bash
-python3 tools/mqtt_ctl.py --wait 15 flash    # 进入 ISP 下载模式
-python3 tools/mqtt_ctl.py --wait 15 reboot
-```
-
-方式二(直接串口,以 switch 为例):
+直接串口(以 switch 为例):
 
 ```bash
 cd <SDK>/tools/flash_tool

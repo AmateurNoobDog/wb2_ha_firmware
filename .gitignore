@@ -1,0 +1,7 @@
+**/build_out
+*.o
+*.pyc
+__pycache__
+.DS_Store
+*.swp
+*.tmp

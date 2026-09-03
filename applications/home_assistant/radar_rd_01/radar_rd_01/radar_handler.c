@@ -43,8 +43,10 @@ int radar_handler_get_state(char *buf, int buf_len)
                     (unsigned long)g_motion_call_count);
 #else
     return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"motion\":%d,\"on\":%d",
-                    DEVICE_MODEL, g_radar_motion, g_radar_motion);
+                    "\"model\":\"%s\",\"motion\":%d,\"presence\":%d",
+                    DEVICE_MODEL,
+                    (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0,
+                    (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0);
 #endif
 }
 

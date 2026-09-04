@@ -1,13 +1,16 @@
 # radar_rd_01 — 雷达存在检测固件
 
-基于 Ai-WB2(BL602) + Ai-Thinker RD-01 雷达芯片的人体存在检测固件。
-BL602 作为 SPI 从机接收雷达数据,通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
+基于 Ai-Thinker RD-01 模组(BL602 + 雷达芯片一体)的人体存在检测固件。
+固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
+通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
 **当前版本: 0.8.0**
 
 ## 硬件连接
 
-### RD-01 雷达芯片接口
+### RD-01 模组内部接口
+
+以下为 BL602 与模组内雷达芯片的内部连接:
 
 | 功能 | BL602 GPIO | 说明 |
 |------|------------|------|
@@ -24,8 +27,8 @@ BL602 作为 SPI 从机接收雷达数据,通过 WiFi + TCP JSON 上报运动/�
 
 ### 工作流程
 
-1. BL602 通过 GPIO 20 给雷达芯片上电
-2. 雷达芯片作为 SPI 主机,以 ~12.5MHz 发送检测数据
+1. BL602 通过 GPIO 20 控制模组内雷达芯片的电源(PMOS 开关)
+2. 雷达芯片上电后作为 SPI 主机,以 ~12.5MHz 发送检测数据
 3. BL602 SPI 从机接收数据,放入队列(`FUNC_QUEUE_SIZE=34`)
 4. 数据处理任务解析雷达帧,提取运动状态
 5. TCP 服务器每 1s 轮询上报状态到 HA
@@ -40,7 +43,7 @@ BL602 作为 SPI 从机接收雷达数据,通过 WiFi + TCP JSON 上报运动/�
 | `wifi_sta.c/h` | WiFi STA 连接管理 |
 | `blufi_app.c/h` | BLE BluFi 配网模块(支持自定义数据接收 HA IP) |
 | `app_config.h` | 设备配置(引脚/端口/名称/调试开关) |
-| `D103/` | 雷达芯片驱动库(原始,未修改) |
+| `D103/` | RD-01 模组内雷达芯片驱动库(原始,未修改) |
 | `bodysense_lib/` | 人体感应算法库 |
 | `axk_factory/` | 出厂测试库 |
 | `hal_wifi/` | WiFi HAL 层 |
@@ -118,9 +121,9 @@ make -j6
 所有配置在 `radar_rd_01/radar_rd_01/app_config.h`:
 
 ```c
-// 雷达硬件
-#define RADAR_CS_PIN          22      // SPI 片选
-#define RADAR_POWER_PIN       25      // 电源控制(实际使用 20)
+// RD-01 模组硬件(内部接口)
+#define RADAR_CS_PIN          22      // SPI 片选(连接模组内雷达芯片)
+#define RADAR_POWER_PIN       25      // 电源控制(实际使用 20,控制模组内雷达芯片)
 
 // 设备身份
 #define TCP_SERVER_PORT       9100
@@ -146,7 +149,7 @@ make -j6
 
 ## 已知限制
 
-- SPI 从机时钟受限于 BL602 SPI 外设,最高 ~12.5MHz
+- RD-01 模组内 SPI 从机时钟受限于 BL602 SPI 外设,最高 ~12.5MHz
 - `spi_timeout_handle` 未创建(始终为 NULL),SPI 超时回调未启用
 - `timer_60ms_handle` 为一次性定时器(period 60ms),用于雷达数据处理调度
 - 推送功能已实现但回退为仅 1s 轮询模式

@@ -18,4 +18,9 @@
 #define STORE_SSID_MAX     64
 #define STORE_PWD_MAX      64
 
+#define HA_PUSH_DEFAULT_PORT  9101
+#define STORE_KEY_HA_IP       "HA_IP"
+#define STORE_KEY_HA_PORT     "HA_PORT"
+#define STORE_IP_MAX          16
+
 #endif /* __APP_CONFIG_H__ */

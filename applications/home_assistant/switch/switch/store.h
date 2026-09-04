@@ -11,11 +11,21 @@ typedef struct {
     char pwd[STORE_PWD_MAX];
 } store_wifi_t;
 
+typedef struct {
+    char ip[STORE_IP_MAX];
+    uint16_t port;
+    uint8_t enabled;
+} store_push_t;
+
 void store_init(void);
 bool store_wifi_load(store_wifi_t *cfg);
 bool store_has_wifi(void);
 void store_wifi_save_ssid(const uint8_t *ssid, int len);
 void store_wifi_save_pwd(const uint8_t *pwd, int len);
 void store_wifi_clear(void);
+
+bool store_push_load(store_push_t *cfg);
+void store_push_save(const char *ip, uint16_t port);
+void store_push_clear(void);
 
 #endif /* __STORE_H__ */

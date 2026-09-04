@@ -13,8 +13,8 @@ int led_handler_get_state(char *buf, int buf_len)
     uint8_t r, g, b;
 
     led_get_state(&r, &g, &b);
-    return snprintf(buf, buf_len, "\"model\":\"%s\",\"r\":%d,\"g\":%d,\"b\":%d",
-                    DEVICE_MODEL, r, g, b);
+    return snprintf(buf, buf_len, "\"model\":\"%s\",\"sw_version\":\"%s\",\"r\":%d,\"g\":%d,\"b\":%d",
+                    DEVICE_MODEL, DEVICE_SW_VERSION, r, g, b);
 }
 
 int led_handler_set_state(const char *cmd_json)

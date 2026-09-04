@@ -14,8 +14,8 @@ int switch_handler_get_state(char *buf, int buf_len)
     int i;
     int used = 0;
 
-    used += snprintf(buf + used, buf_len - used, "\"model\":\"%s\",\"count\":%d",
-                     DEVICE_MODEL, SWITCH_COUNT);
+    used += snprintf(buf + used, buf_len - used, "\"model\":\"%s\",\"sw_version\":\"%s\",\"count\":%d",
+                     DEVICE_MODEL, DEVICE_SW_VERSION, SWITCH_COUNT);
     used += snprintf(buf + used, buf_len - used, ",\"names\":[");
     for (i = 0; i < SWITCH_COUNT; i++) {
         used += snprintf(buf + used, buf_len - used, "\"%s\"%s",

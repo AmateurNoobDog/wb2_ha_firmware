@@ -6,6 +6,7 @@
 #include "app_config.h"
 #include "body_presence.h"
 #include "ha_json.h"
+#include "ha_push.h"
 #include "cmdprocess.h"
 #include "banyan.h"
 #include "AlgorithmConfig.h"
@@ -43,10 +44,11 @@ int radar_handler_get_state(char *buf, int buf_len)
                     (unsigned long)g_motion_call_count);
 #else
     return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"motion\":%d,\"presence\":%d",
-                    DEVICE_MODEL,
+                    "\"model\":\"%s\",\"sw_version\":\"%s\",\"motion\":%d,\"presence\":%d,\"push\":%d",
+                    DEVICE_MODEL, DEVICE_SW_VERSION,
                     (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0,
-                    (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0);
+                    (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0,
+                    ha_push_enabled());
 #endif
 }
 
@@ -123,6 +125,14 @@ int radar_handler_set_state(const char *cmd_json)
     if (strncmp(cmd, "restore", 7) == 0) {
         return radar_handler_restore_defaults();
     }
+    if (strncmp(cmd, "push_cfg", 8) == 0) {
+        const char *ip = ha_json_str(cmd_json, "ip");
+        int port = ha_json_int(cmd_json, "port", HA_PUSH_DEFAULT_PORT);
+        if (ip) {
+            ha_push_set_target(ip, (uint16_t)port);
+        }
+        return 0;
+    }
     return 0;
 }
 
@@ -130,4 +140,9 @@ void radar_handler_set_motion(uint8_t motion)
 {
     g_radar_motion = motion;
     g_motion_call_count++;
+}
+
+uint8_t radar_handler_get_motion(void)
+{
+    return g_radar_motion;
 }

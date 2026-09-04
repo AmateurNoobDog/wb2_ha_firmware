@@ -20,6 +20,9 @@
 
 #include "blufi_app.h"
 #include "store.h"
+#include "ha_push.h"
+#include "ha_json.h"
+#include "app_config.h"
 
 static int scan_counter;
 static bool ble_is_connected = false;
@@ -226,9 +229,18 @@ static void example_event_callback(_blufi_cb_event_t event, _blufi_cb_param_t *p
         break;
 
     case AXK_BLUFI_EVENT_RECV_CUSTOM_DATA:
+    {
         printf("[BLUFI] recv custom data len:%d\n", param->custom_data.data_len);
+        const char *ha_ip = ha_json_str((const char *)param->custom_data.data, "ha_ip");
+        if (ha_ip) {
+            int ha_port = ha_json_int((const char *)param->custom_data.data, "ha_port",
+                                      HA_PUSH_DEFAULT_PORT);
+            ha_push_set_target(ha_ip, (uint16_t)ha_port);
+            printf("[BLUFI] push target set: %s:%d\n", ha_ip, ha_port);
+        }
         axk_blufi_send_custom_data(param->custom_data.data, param->custom_data.data_len);
         break;
+    }
 
     case AXK_BLUFI_EVENT_RECV_USERNAME:
     case AXK_BLUFI_EVENT_RECV_CA_CERT:

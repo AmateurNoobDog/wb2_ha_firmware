@@ -12,7 +12,9 @@
 #include "wifi_sta.h"
 #include "blufi_app.h"
 #include "ha_device.h"
+#include "ha_push.h"
 #include "app_config.h"
+#include <wifi_mgmr_ext.h>
 
 #include "platform.h"
 #include "config.h"
@@ -38,6 +40,7 @@ static void on_got_ip(void)
 {
     blog_info("[APP] got ip, starting tcp json server");
     blog_info("[SYS] Memory left is %d Bytes", xPortGetFreeHeapSize());
+    ha_push_init();
     xTaskCreate(ha_tcp_server_start, (char *)"tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 15, NULL);
 }
 
@@ -76,7 +79,26 @@ static uint8_t parse_radar_motion(uint8_t *buf, uint16_t len)
 static void radar_data_forward(uint8_t *buff, uint16_t len)
 {
     uint8_t motion = parse_radar_motion(buff, len);
+    uint8_t old_motion = radar_handler_get_motion();
+
     radar_handler_set_motion(motion);
+
+    if (motion != old_motion && ha_push_enabled()) {
+        uint8_t mac[6];
+        char dev[192];
+        char full_json[256];
+
+        radar_handler_get_state(dev, sizeof(dev));
+        if (wifi_mgmr_sta_mac_get(mac) != 0) {
+            memset(mac, 0, sizeof(mac));
+        }
+        snprintf(full_json, sizeof(full_json),
+                 "{\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
+                 "\"type\":\"%s\",\"name\":\"%s\",%s}",
+                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
+                 DEVICE_TYPE, DEVICE_NAME, dev);
+        ha_push_send(full_json);
+    }
 
     if (original_radar_callback) {
         original_radar_callback(buff, len);

@@ -13,12 +13,19 @@
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "\xE9\x9B\xB7\xE8\xBE\xBE"  // "雷达" UTF-8
 #define DEVICE_MODEL          "RD-01"
+#define DEVICE_SW_VERSION     "0.8.0"
 
 // Storage keys
 #define STORE_KEY_SSID        "ROUTER_SSID"
 #define STORE_KEY_PWD         "ROUTER_PWD"
 #define STORE_SSID_MAX        64
 #define STORE_PWD_MAX         64
+
+// Push reporting configuration
+#define HA_PUSH_DEFAULT_PORT  9101    // HA push listening port (default)
+#define STORE_KEY_HA_IP       "HA_IP"
+#define STORE_KEY_HA_PORT     "HA_PORT"
+#define STORE_IP_MAX          16      // "255.255.255.255" + \0
 
 // Radar data processing configuration
 #define FUNC_QUEUE_SIZE       34      // SPI data queue size

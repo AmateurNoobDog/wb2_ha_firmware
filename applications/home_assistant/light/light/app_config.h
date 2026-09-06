@@ -15,7 +15,7 @@
 #define DEVICE_TYPE        "wb2"
 #define DEVICE_NAME        "\xE5\xBD\xA9\xE7\x81\xAF"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "0.8.0"
+#define DEVICE_SW_VERSION  "0.8.5"
 
 #define STORE_KEY_SSID     "ROUTER_SSID"
 #define STORE_KEY_PWD      "ROUTER_PWD"

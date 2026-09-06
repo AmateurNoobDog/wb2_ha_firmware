@@ -6,6 +6,7 @@
 static uint8_t s_r = 0;
 static uint8_t s_g = 0;
 static uint8_t s_b = 0;
+static uint8_t s_brightness = 255;
 
 static void led_set_channel(uint8_t ch, uint8_t level)
 {
@@ -24,22 +25,24 @@ void led_init(void)
     s_r = 0;
     s_g = 0;
     s_b = 0;
+    s_brightness = 255;
     led_set_channel(LED_RED_CH, 0);
     led_set_channel(LED_GREEN_CH, 0);
     led_set_channel(LED_BLUE_CH, 0);
 }
 
-void led_set_state(uint8_t r, uint8_t g, uint8_t b)
+void led_set_state(uint8_t r, uint8_t g, uint8_t b, uint8_t brightness)
 {
     s_r = r;
     s_g = g;
     s_b = b;
-    led_set_channel(LED_RED_CH, s_r);
-    led_set_channel(LED_GREEN_CH, s_g);
-    led_set_channel(LED_BLUE_CH, s_b);
+    s_brightness = brightness;
+    led_set_channel(LED_RED_CH,   s_r   * s_brightness / 255);
+    led_set_channel(LED_GREEN_CH, s_g   * s_brightness / 255);
+    led_set_channel(LED_BLUE_CH,  s_b   * s_brightness / 255);
 }
 
-void led_get_state(uint8_t *r, uint8_t *g, uint8_t *b)
+void led_get_state(uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *brightness)
 {
     if (r != NULL) {
         *r = s_r;
@@ -49,5 +52,8 @@ void led_get_state(uint8_t *r, uint8_t *g, uint8_t *b)
     }
     if (b != NULL) {
         *b = s_b;
+    }
+    if (brightness != NULL) {
+        *brightness = s_brightness;
     }
 }

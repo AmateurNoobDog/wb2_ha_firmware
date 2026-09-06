@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 void led_init(void);
-void led_set_state(uint8_t r, uint8_t g, uint8_t b);
-void led_get_state(uint8_t *r, uint8_t *g, uint8_t *b);
+void led_set_state(uint8_t r, uint8_t g, uint8_t b, uint8_t brightness);
+void led_get_state(uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *brightness);
 
 #endif /* __LED_H__ */

@@ -7,12 +7,14 @@
 #include "blog.h"
 #include <hosal_gpio.h>
 
+#include <lwip/tcpip.h>
 #include "radar_handler.h"
 #include "store.h"
 #include "wifi_sta.h"
 #include "blufi_app.h"
 #include "ha_device.h"
 #include "ha_push.h"
+#include "ha_mdns.h"
 #include "app_config.h"
 #include <wifi_mgmr_ext.h>
 
@@ -41,6 +43,7 @@ static void on_got_ip(void)
     blog_info("[APP] got ip, starting tcp json server");
     blog_info("[SYS] Memory left is %d Bytes", xPortGetFreeHeapSize());
     ha_push_init();
+    ha_mdns_start();
     xTaskCreate(ha_tcp_server_start, (char *)"tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 15, NULL);
 }
 
@@ -243,6 +246,7 @@ int main(void)
     hook_radar_callback();
 
     puts("[OS] radar_rd_01 starting...");
+    tcpip_init(NULL, NULL);
     boot_mode();
     puts("[OS] main exit");
 

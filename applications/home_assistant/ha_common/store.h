@@ -4,20 +4,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "app_config.h"
-
 typedef struct {
-    char ssid[STORE_SSID_MAX];
-    char pwd[STORE_PWD_MAX];
+    char ssid[64];
+    char pwd[64];
 } store_wifi_t;
 
 typedef struct {
-    char ip[STORE_IP_MAX];
+    char ip[16];
     uint16_t port;
     uint8_t enabled;     // 1 if HA IP is configured
 } store_push_t;
 
 void store_init(void);
+
 bool store_wifi_load(store_wifi_t *cfg);
 bool store_has_wifi(void);
 void store_wifi_save_ssid(const uint8_t *ssid, int len);

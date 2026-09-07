@@ -52,15 +52,17 @@ INCLUDE_COMPONENTS += rfparam_adapter_tmp
 INCLUDE_COMPONENTS += blufi
 INCLUDE_COMPONENTS += main
 INCLUDE_COMPONENTS += ha_lib
+INCLUDE_COMPONENTS += ha_common
+INCLUDE_COMPONENTS += lwip_mdns
 
 # Radar specific components
-INCLUDE_COMPONENTS += D103 bodysense_lib axk_factory hal_wifi axk_cfg nmsis
+INCLUDE_COMPONENTS += D103 bodysense_lib axk_factory axk_cfg nmsis
 
 EXTRA_COMPONENT_DIRS := $(BL60X_SDK_PATH)/applications/home_assistant/ha_lib
+EXTRA_COMPONENT_DIRS += $(BL60X_SDK_PATH)/applications/home_assistant/ha_common
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/D103
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/bodysense_lib
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/axk_factory
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/hal_wifi
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/axk_cfg
 
 ifeq ($(CONFIG_COMPONENT_BUGKILLER_ENABLE),1)

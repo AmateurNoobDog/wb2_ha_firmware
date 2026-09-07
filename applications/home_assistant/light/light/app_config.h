@@ -12,10 +12,10 @@
 #define TCP_SERVER_PORT    9100
 #define TCP_SERVER_STACK   4096
 
-#define DEVICE_TYPE        "wb2"
+#define DEVICE_TYPE        "light"
 #define DEVICE_NAME        "\xE5\xBD\xA9\xE7\x81\xAF"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "0.8.5"
+#define DEVICE_SW_VERSION  "0.9.0"
 
 #define STORE_KEY_SSID     "ROUTER_SSID"
 #define STORE_KEY_PWD      "ROUTER_PWD"

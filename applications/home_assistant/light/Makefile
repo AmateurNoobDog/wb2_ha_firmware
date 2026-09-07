@@ -54,8 +54,11 @@ INCLUDE_COMPONENTS += rfparam_adapter_tmp
 INCLUDE_COMPONENTS += blufi
 INCLUDE_COMPONENTS += main
 INCLUDE_COMPONENTS += ha_lib
+INCLUDE_COMPONENTS += ha_common
+INCLUDE_COMPONENTS += lwip_mdns
 
 EXTRA_COMPONENT_DIRS := $(BL60X_SDK_PATH)/applications/home_assistant/ha_lib
+EXTRA_COMPONENT_DIRS += $(BL60X_SDK_PATH)/applications/home_assistant/ha_common
 
 ifeq ($(CONFIG_COMPONENT_BUGKILLER_ENABLE),1)
 INCLUDE_COMPONENTS += bugkiller_freertos

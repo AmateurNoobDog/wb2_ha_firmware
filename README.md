@@ -4,23 +4,31 @@
 设备通过 WiFi 接入局域网,使用轻量 TCP JSON 协议与 Home Assistant 集成
 (配套集成见 [`ha_ai_thinker_home`](https://gitee.com/amateur-dog/ha_ai_thinker_home))。
 
-**当前版本: 0.8.0**
+**当前版本: 0.9.0**
 
 ## 项目结构
 
 ```
 applications/home_assistant/
+├── ha_common/    # 共享模块:blufi_app/store/wifi_sta/ha_mdns
 ├── ha_lib/       # 共享库:设备无关的 TCP JSON 服务器 + JSON 解析器 + 推送模块
-├── light/        # RGB 彩灯固件(3 路 PWM,设备类型 wb2)
-├── radar_rd_01/  # 雷达存在检测固件(RD-01 芯片,设备类型 radar,v0.8.0)
-└── switch/       # 3 路智能开关固件(GPIO 继电器,设备类型 sw)
+├── light/        # RGB 彩灯固件(3 路 PWM + 亮度控制,设备类型 light,v0.9.0)
+├── radar_rd_01/  # 雷达存在检测固件(RD-01 模组,设备类型 radar,v0.9.0)
+└── switch/       # 3 路智能开关固件(GPIO 继电器,设备类型 switch,v0.9.0)
 ```
+
+### ha_common(共享模块)
+- `blufi_app.c/h` — BLE BluFi 配网模块
+- `store.c/h`     — WiFi 凭据 + 推送配置持久化(EasyFlash)
+- `wifi_sta.c/h`  — WiFi STA 连接管理
+- `ha_mdns.c/h`   — mDNS 服务发现
+- `bouffalo.mk`   — BL602 SDK 组件构建脚本
 
 ### ha_lib(共享组件)
 - `ha_device.h`  — 设备抽象:类型、名称、端口、`get_state`/`set_state` 回调
 - `ha_json.c/h`  — 极简 JSON 字段解析(`ha_json_str`/`ha_json_int`)
 - `tcp_json_server.c` — 通用 TCP 服务:响应 `mac/type/name` + 设备字段,`cmd:set` 分发到设备回调
-- `ha_push.c/h`  — 推送模块(NVS 配置目标 IP/端口 + TCP 推送),目前代码存在但功能已回退为仅 1s 轮询
+- `ha_push.c/h`  — 推送模块(NVS 配置目标 IP/端口 + TCP 推送)
 
 新设备只需实现自己的 handler 并注册 `ha_device_t` 即可复用服务器。
 
@@ -62,7 +70,7 @@ cd <SDK>/tools/flash_tool
 
 - 开机若检测到已保存的 WiFi 配置则直连;
 - 否则进入 BLE blufi 配网(使用官方 blufi 手机端/小程序);
-- WiFi 凭据通过 EasyFlash 持久化(`store.c`),可用 CLI 命令 `cfg_clear` 清除。
+- WiFi 凭据通过 EasyFlash 持久化(`ha_common/store.c`),可用 CLI 命令 `cfg_clear` 清除。
 
 ## 设备协议(TCP 9100)
 
@@ -73,11 +81,24 @@ cd <SDK>/tools/flash_tool
 {"cmd":"get"}
 ```
 
+响应示例(彩灯):
+```json
+{"mac":"AC:D8:29:7A:60:5D","type":"light","name":"彩灯","model":"Ai-WB2-12F","sw_version":"0.9.0",
+ "r":255,"g":128,"b":0,"brightness":200,"push":0}
+```
+
+控制(彩灯):
+```json
+{"cmd":"set","r":255,"g":128,"b":0,"brightness":200}
+{"cmd":"set","r":255}       // 仅设置红色
+{"cmd":"set","brightness":128}  // 仅设置亮度
+```
+
 响应示例(开关):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"sw","name":"智能开关","model":"Ai-WB2-12F",
+{"mac":"AC:D8:29:7A:60:5D","type":"switch","name":"智能开关","model":"Ai-WB2-12F","sw_version":"0.9.0",
  "count":3,"names":["开关1","开关2","开关3"],
- "on":0,"on1":0,"on2":0}
+ "on":0,"on1":0,"on2":0,"push":0}
 ```
 
 控制(开关,按通道):
@@ -87,14 +108,9 @@ cd <SDK>/tools/flash_tool
 {"cmd":"set","on2":1}       // 通道 3
 ```
 
-控制(彩灯):
-```json
-{"cmd":"set","r":255,"g":128,"b":0}
-```
-
 响应示例(雷达):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.8.0",
+{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.9.0",
  "motion":0,"presence":0,"push":0}
 ```
 
@@ -104,12 +120,17 @@ cd <SDK>/tools/flash_tool
 {"cmd":"restore"}         // 恢复默认参数
 ```
 
+推送配置(彩灯/开关/雷达):
+```json
+{"cmd":"push_cfg","ip":"192.168.1.100","port":9101}
+```
+
 ### 字段说明
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `mac` | string | 设备 MAC 地址 |
-| `type` | string | 设备类型:`wb2`(灯)/ `sw`(开关)/ `radar`(雷达),用于 HA 平台选择 |
+| `type` | string | 设备类型:`light`(彩灯)/ `switch`(开关)/ `radar`(雷达),用于 HA 平台选择 |
 | `name` | string | 设备名称,由设备上报 |
 | `model` | string | 设备型号,由设备上报 |
 | `sw_version` | string | 固件版本号,由设备上报 |
@@ -117,6 +138,7 @@ cd <SDK>/tools/flash_tool
 | `names` | array | 各通道名称,由设备上报 |
 | `on`/`on1`/`on2` | int | 各通道状态(0/1) |
 | `r`/`g`/`b` | int | 彩灯 RGB 值(0-255) |
+| `brightness` | int | 彩灯亮度(0-255),仅 light 设备 |
 | `motion` | int | 运动检测状态(0/1),仅 BODYMOTION/BOTH_STATUS 触发 |
 | `presence` | int | 存在检测状态(0/1),任何检测结果均触发 |
 | `push` | int | 推送上报开关(0/1) |

@@ -12,12 +12,15 @@
 #define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "\xE6\x99\xBA\xE8\x83\xBD\xE5\xBC\x80\xE5\x85\xB3"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "0.9.0"
+#define DEVICE_SW_VERSION  "0.9.1"
 
 #define STORE_KEY_SSID     "ROUTER_SSID"
 #define STORE_KEY_PWD      "ROUTER_PWD"
 #define STORE_SSID_MAX     64
 #define STORE_PWD_MAX      64
+
+#define REBOOT_PROVISION_COUNT  3
+#define STORE_KEY_BOOT_CNT      "BOOT_CNT"
 
 #define HA_PUSH_DEFAULT_PORT  9101
 #define STORE_KEY_HA_IP       "HA_IP"

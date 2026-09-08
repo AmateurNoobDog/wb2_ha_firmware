@@ -13,7 +13,11 @@
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "\xE9\x9B\xB7\xE8\xBE\xBE"  // "雷达" UTF-8
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.9.0"
+#define DEVICE_SW_VERSION     "0.9.1"
+
+// Reboot provisioning detection
+#define REBOOT_PROVISION_COUNT  3
+#define STORE_KEY_BOOT_CNT      "BOOT_CNT"
 
 // Storage keys
 #define STORE_KEY_SSID        "ROUTER_SSID"

@@ -6,6 +6,7 @@
 #include <task.h>
 #include <lwip/tcpip.h>
 #include <bl_sys.h>
+#include <hal_sys.h>
 #include <cli.h>
 
 #include "wifi_interface.h"
@@ -101,8 +102,12 @@ static void blufi_wifi_event(int event, void *param)
             printf("[BLUFI] BLE is not connected yet\n");
         }
 
-        printf("[BLUFI] provisioning ok, connected (stay running)\n");
+        printf("[BLUFI] provisioning ok, connected\n");
         g_blufi_config.wifi.cwmode = WIFIMODE_STA;
+        store_reboot_provision_clear();
+        vTaskDelay(pdMS_TO_TICKS(500));
+        printf("[BLUFI] rebooting into normal mode\n");
+        hal_sys_reset();
     }
     break;
 

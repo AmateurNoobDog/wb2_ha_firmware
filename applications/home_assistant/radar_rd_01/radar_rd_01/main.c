@@ -40,6 +40,7 @@ static const ha_device_t ha_dev = {
 
 static void on_got_ip(void)
 {
+    store_reboot_provision_clear();
     blog_info("[APP] got ip, starting tcp json server");
     blog_info("[SYS] Memory left is %d Bytes", xPortGetFreeHeapSize());
     ha_push_init();
@@ -205,12 +206,20 @@ static void boot_mode(void)
     store_init();
     aos_register_event_filter(EV_WIFI, app_evt_cb, NULL);
 
+    if (store_reboot_provision_check(REBOOT_PROVISION_COUNT)) {
+        blog_info("[APP] %d consecutive reboots, enter provisioning mode", REBOOT_PROVISION_COUNT);
+        store_reboot_provision_clear();
+        blufi_app_start();
+        return;
+    }
+
     if (store_wifi_load(&cfg)) {
         blog_info("[APP] wifi ssid: %s", cfg.ssid);
         blog_info("[APP] connecting wifi");
         wifi_sta_start(cfg.ssid, cfg.pwd);
     } else {
         blog_info("[APP] no wifi config, enter blufi provisioning");
+        store_reboot_provision_clear();
         blufi_app_start();
     }
 }

@@ -27,4 +27,7 @@ bool store_push_load(store_push_t *cfg);
 void store_push_save(const char *ip, uint16_t port);
 void store_push_clear(void);
 
+bool store_reboot_provision_check(int threshold);
+void store_reboot_provision_clear(void);
+
 #endif /* __STORE_H__ */

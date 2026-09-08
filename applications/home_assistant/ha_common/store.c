@@ -111,6 +111,26 @@ void store_push_clear(void)
     printf("[STORE] push config cleared\n");
 }
 
+bool store_reboot_provision_check(int threshold)
+{
+    uint8_t cnt = 0;
+    size_t read_len = 0;
+    ef_get_env_blob(STORE_KEY_BOOT_CNT, &cnt, sizeof(cnt), &read_len);
+    cnt++;
+    ef_set_env_blob(STORE_KEY_BOOT_CNT, &cnt, sizeof(cnt));
+    ef_save_env();
+    printf("[STORE] boot count: %d/%d\n", cnt, threshold);
+    return cnt >= threshold;
+}
+
+void store_reboot_provision_clear(void)
+{
+    uint8_t cnt = 0;
+    ef_set_env_blob(STORE_KEY_BOOT_CNT, &cnt, sizeof(cnt));
+    ef_save_env();
+    printf("[STORE] boot count cleared\n");
+}
+
 static void cmd_cfg_clear(char *buf, int len, int argc, char **argv)
 {
     store_wifi_clear();

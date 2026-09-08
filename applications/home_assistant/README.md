@@ -4,33 +4,32 @@
 设备通过 WiFi 接入局域网,使用轻量 TCP JSON 协议与 Home Assistant 集成
 (配套集成见 [`ha_ai_thinker_home`](https://gitee.com/amateur-dog/ha_ai_thinker_home))。
 
-**当前版本: 0.9.0**
+**当前版本: 0.9.1**
 
 ## 项目结构
 
 ```
 applications/home_assistant/
-├── ha_common/    # 共享模块:blufi_app/store/wifi_sta/ha_mdns
 ├── ha_lib/       # 共享库:设备无关的 TCP JSON 服务器 + JSON 解析器 + 推送模块
-├── light/        # RGB 彩灯固件(3 路 PWM + 亮度控制,设备类型 light,v0.9.0)
-├── radar_rd_01/  # 雷达存在检测固件(RD-01 模组,设备类型 radar,v0.9.0)
-└── switch/       # 3 路智能开关固件(GPIO 继电器,设备类型 switch,v0.9.0)
+├── ha_common/    # 公共组件:store(wifi/easyflash)、wifi_sta、blufi_app(蓝牙配网)、ha_mdns
+├── light/        # RGB 彩灯固件(3 路 PWM,设备类型 light)
+├── radar_rd_01/  # 雷达存在检测固件(RD-01 芯片,设备类型 radar)
+└── switch/       # 3 路智能开关固件(GPIO 继电器,设备类型 switch)
 ```
-
-### ha_common(共享模块)
-- `blufi_app.c/h` — BLE BluFi 配网模块
-- `store.c/h`     — WiFi 凭据 + 推送配置持久化(EasyFlash)
-- `wifi_sta.c/h`  — WiFi STA 连接管理
-- `ha_mdns.c/h`   — mDNS 服务发现
-- `bouffalo.mk`   — BL602 SDK 组件构建脚本
 
 ### ha_lib(共享组件)
 - `ha_device.h`  — 设备抽象:类型、名称、端口、`get_state`/`set_state` 回调
 - `ha_json.c/h`  — 极简 JSON 字段解析(`ha_json_str`/`ha_json_int`)
 - `tcp_json_server.c` — 通用 TCP 服务:响应 `mac/type/name` + 设备字段,`cmd:set` 分发到设备回调
-- `ha_push.c/h`  — 推送模块(NVS 配置目标 IP/端口 + TCP 推送)
+- `ha_push.c/h`  — 推送模块(TCP 推送至 HA 配置的目标 IP/端口)
 
 新设备只需实现自己的 handler 并注册 `ha_device_t` 即可复用服务器。
+
+### ha_common(公共组件)
+- `store.h/c`    — WiFi 配置持久化(EasyFlash),BOOT_CNT 连续重启计数
+- `wifi_sta.h/c` — WiFi STA 模式启动,事件驱动
+- `blufi_app.h/c`— BLE BluFi 配网,配网成功后自动重启
+- `ha_mdns.h/c`  — mDNS 服务注册(`_aitinker._tcp`,端口 9100,TXT: type/name)
 
 ## 使用方法
 
@@ -68,9 +67,21 @@ cd <SDK>/tools/flash_tool
 
 ### 4. 配网
 
-- 开机若检测到已保存的 WiFi 配置则直连;
-- 否则进入 BLE blufi 配网(使用官方 blufi 手机端/小程序);
-- WiFi 凭据通过 EasyFlash 持久化(`ha_common/store.c`),可用 CLI 命令 `cfg_clear` 清除。
+开机配网逻辑:
+```
+开机 → BOOT_CNT++
+  │
+  ├─ BOOT_CNT ≥ 3 → 清零 BOOT_CNT → 进入 BLE BluFi 配网(保留已有 WiFi 配置)
+  │
+  ├─ 有 WiFi 配置 → 连接 WiFi → got_ip → 清零 BOOT_CNT → 正常工作
+  │                                   (TCP/mDNS/Push 启动)
+  │
+  └─ 无 WiFi 配置 → 清零 BOOT_CNT → 进入 BLE BluFi 配网
+```
+
+配网成功后设备自动重启,进入正常工作模式。
+
+WiFi 凭据通过 EasyFlash 持久化(`store.c`),可用 CLI 命令 `cfg_clear` 清除。
 
 ## 设备协议(TCP 9100)
 
@@ -81,24 +92,11 @@ cd <SDK>/tools/flash_tool
 {"cmd":"get"}
 ```
 
-响应示例(彩灯):
-```json
-{"mac":"AC:D8:29:7A:60:5D","type":"light","name":"彩灯","model":"Ai-WB2-12F","sw_version":"0.9.0",
- "r":255,"g":128,"b":0,"brightness":200,"push":0}
-```
-
-控制(彩灯):
-```json
-{"cmd":"set","r":255,"g":128,"b":0,"brightness":200}
-{"cmd":"set","r":255}       // 仅设置红色
-{"cmd":"set","brightness":128}  // 仅设置亮度
-```
-
 响应示例(开关):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"switch","name":"智能开关","model":"Ai-WB2-12F","sw_version":"0.9.0",
+{"mac":"AC:D8:29:7A:60:5D","type":"switch","name":"智能开关","model":"Ai-WB2-12F",
  "count":3,"names":["开关1","开关2","开关3"],
- "on":0,"on1":0,"on2":0,"push":0}
+ "on":0,"on1":0,"on2":0}
 ```
 
 控制(开关,按通道):
@@ -108,9 +106,14 @@ cd <SDK>/tools/flash_tool
 {"cmd":"set","on2":1}       // 通道 3
 ```
 
+控制(彩灯):
+```json
+{"cmd":"set","r":255,"g":128,"b":0}
+```
+
 响应示例(雷达):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.9.0",
+{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.9.1",
  "motion":0,"presence":0,"push":0}
 ```
 
@@ -120,17 +123,12 @@ cd <SDK>/tools/flash_tool
 {"cmd":"restore"}         // 恢复默认参数
 ```
 
-推送配置(彩灯/开关/雷达):
-```json
-{"cmd":"push_cfg","ip":"192.168.1.100","port":9101}
-```
-
 ### 字段说明
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `mac` | string | 设备 MAC 地址 |
-| `type` | string | 设备类型:`light`(彩灯)/ `switch`(开关)/ `radar`(雷达),用于 HA 平台选择 |
+| `type` | string | 设备类型:`light`(灯)/ `switch`(开关)/ `radar`(雷达),用于 HA 平台选择 |
 | `name` | string | 设备名称,由设备上报 |
 | `model` | string | 设备型号,由设备上报 |
 | `sw_version` | string | 固件版本号,由设备上报 |
@@ -138,7 +136,6 @@ cd <SDK>/tools/flash_tool
 | `names` | array | 各通道名称,由设备上报 |
 | `on`/`on1`/`on2` | int | 各通道状态(0/1) |
 | `r`/`g`/`b` | int | 彩灯 RGB 值(0-255) |
-| `brightness` | int | 彩灯亮度(0-255),仅 light 设备 |
 | `motion` | int | 运动检测状态(0/1),仅 BODYMOTION/BOTH_STATUS 触发 |
 | `presence` | int | 存在检测状态(0/1),任何检测结果均触发 |
 | `push` | int | 推送上报开关(0/1) |
@@ -158,6 +155,15 @@ cd <SDK>/tools/flash_tool
 转换逻辑:
 - **motion**: 仅在 `原始值 == 1 或 3` 时为 1(检测到运动)
 - **presence**: 在 `原始值 >= 1 且 <= 3` 时为 1(检测到任何存在)
+
+### mDNS 自动发现
+
+设备启动后注册 mDNS 服务:
+- 服务类型: `_aitinker._tcp`
+- 主机名: `Ai-{type}-{MAC后3字节}.local` (如 `Ai-light-1D94F1.local`)
+- TXT 记录: `type=light`, `name=彩灯`
+
+Home Assistant 通过 zeroconf 自动发现局域网内的设备。
 
 ## 配置
 

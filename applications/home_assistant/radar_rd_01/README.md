@@ -4,7 +4,7 @@
 固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
 通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
-**当前版本: 0.9.0**
+**当前版本: 0.8.0**
 
 ## 硬件连接
 
@@ -37,16 +37,17 @@
 
 | 文件 | 说明 |
 |------|------|
-| `main.c` | 应用入口,WiFi 事件处理,`ha_device_t` 注册,雷达数据回调,ha_mdns 初始化 |
+| `main.c` | 应用入口,WiFi 事件处理,`ha_device_t` 注册,雷达数据回调 |
 | `radar_handler.c/h` | 设备回调: `get_state` 返回 `"model","sw_version","motion","presence","push"` |
-| `app_config.h` | 设备配置(引脚/端口/名称/版本/调试开关) |
+| `store.c/h` | WiFi 凭据 + 推送配置持久化(EasyFlash) |
+| `wifi_sta.c/h` | WiFi STA 连接管理 |
+| `blufi_app.c/h` | BLE BluFi 配网模块(支持自定义数据接收 HA IP) |
+| `app_config.h` | 设备配置(引脚/端口/名称/调试开关) |
 | `D103/` | RD-01 模组内雷达芯片驱动库(原始,未修改) |
 | `bodysense_lib/` | 人体感应算法库 |
 | `axk_factory/` | 出厂测试库 |
 | `hal_wifi/` | WiFi HAL 层 |
 | `axk_cfg/` | 配置管理库 |
-
-> blufi_app/store/wifi_sta 位于 `ha_common/` 共享模块。
 
 ## TCP 协议
 
@@ -59,7 +60,7 @@
 
 响应(默认模式):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.9.0",
+{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.8.0",
  "motion":0,"presence":0,"push":0}
 ```
 
@@ -112,7 +113,7 @@
 ```bash
 cd applications/home_assistant/radar_rd_01
 make -j6
-# 产物: build_out/radar_rd_01.bin (~596K)
+# 产物: build_out/radar_rd_01.bin (~589K)
 ```
 
 ## 配置
@@ -129,7 +130,7 @@ make -j6
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.9.0"
+#define DEVICE_SW_VERSION     "0.8.0"
 
 // 推送配置
 #define HA_PUSH_DEFAULT_PORT  9101    // HA 推送监听端口
@@ -151,3 +152,4 @@ make -j6
 - RD-01 模组内 SPI 从机时钟受限于 BL602 SPI 外设,最高 ~12.5MHz
 - `spi_timeout_handle` 未创建(始终为 NULL),SPI 超时回调未启用
 - `timer_60ms_handle` 为一次性定时器(period 60ms),用于雷达数据处理调度
+- 推送功能已实现但回退为仅 1s 轮询模式

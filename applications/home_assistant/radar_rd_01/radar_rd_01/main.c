@@ -33,7 +33,10 @@ TimerHandle_t spi_timeout_handle = NULL;
 static const ha_device_t ha_dev = {
     .type = DEVICE_TYPE,
     .name = DEVICE_NAME,
+    .model = DEVICE_MODEL,
+    .sw_version = DEVICE_SW_VERSION,
     .port = TCP_SERVER_PORT,
+    .get_device = radar_handler_get_device,
     .get_state = radar_handler_get_state,
     .set_state = radar_handler_set_state,
 };
@@ -89,19 +92,25 @@ static void radar_data_forward(uint8_t *buff, uint16_t len)
 
     if (motion != old_motion && ha_push_enabled()) {
         uint8_t mac[6];
-        char dev[192];
-        char full_json[256];
+        char id1[20], id2[20];
+        char json[192];
 
-        radar_handler_get_state(dev, sizeof(dev));
         if (wifi_mgmr_sta_mac_get(mac) != 0) {
             memset(mac, 0, sizeof(mac));
         }
-        snprintf(full_json, sizeof(full_json),
-                 "{\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
-                 "\"type\":\"%s\",\"name\":\"%s\",%s}",
-                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
-                 DEVICE_TYPE, DEVICE_NAME, dev);
-        ha_push_send(full_json);
+        gen_entity_id(id1, sizeof(id1), mac, 1);
+        gen_entity_id(id2, sizeof(id2), mac, 2);
+
+        int presence = (motion >= 1 && motion <= 3) ? 1 : 0;
+        int motion_flag = (motion == 1 || motion == 3) ? 1 : 0;
+
+        snprintf(json, sizeof(json),
+                 "{\"entities\":["
+                 "{\"id\":\"%s\",\"type\":\"binary_sensor\",\"value\":%d},"
+                 "{\"id\":\"%s\",\"type\":\"binary_sensor\",\"value\":%d}"
+                 "]}",
+                 id1, presence, id2, motion_flag);
+        ha_push_send(json);
     }
 
     if (original_radar_callback) {

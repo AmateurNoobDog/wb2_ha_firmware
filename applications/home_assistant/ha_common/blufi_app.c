@@ -24,6 +24,7 @@
 #include "ha_push.h"
 #include "ha_json.h"
 #include "app_config.h"
+#include <cJSON.h>
 
 static int scan_counter;
 static bool ble_is_connected = false;
@@ -236,13 +237,44 @@ static void example_event_callback(_blufi_cb_event_t event, _blufi_cb_param_t *p
     case AXK_BLUFI_EVENT_RECV_CUSTOM_DATA:
     {
         printf("[BLUFI] recv custom data len:%d\n", param->custom_data.data_len);
-        const char *ha_ip = ha_json_str((const char *)param->custom_data.data, "ha_ip");
-        if (ha_ip) {
-            int ha_port = ha_json_int((const char *)param->custom_data.data, "ha_port",
-                                      HA_PUSH_DEFAULT_PORT);
-            ha_push_set_target(ha_ip, (uint16_t)ha_port);
-            printf("[BLUFI] push target set: %s:%d\n", ha_ip, ha_port);
+        printf("[BLUFI] custom data: %.*s\n", param->custom_data.data_len,
+               (const char *)param->custom_data.data);
+
+        char buf[256];
+        int len = param->custom_data.data_len;
+        if (len >= sizeof(buf)) len = sizeof(buf) - 1;
+        memcpy(buf, param->custom_data.data, len);
+        buf[len] = '\0';
+
+        cJSON *root = cJSON_Parse(buf);
+        if (root == NULL) {
+            printf("[BLUFI] JSON parse error\n");
+            ha_push_clear();
+        } else {
+            cJSON *tcp_obj = cJSON_GetObjectItem(root, "tcp");
+            if (tcp_obj && tcp_obj->type == cJSON_Object) {
+                cJSON *addr_obj = cJSON_GetObjectItem(tcp_obj, "addr");
+                cJSON *port_obj = cJSON_GetObjectItem(tcp_obj, "port");
+                if (addr_obj && addr_obj->type == cJSON_String && addr_obj->valuestring) {
+                    int port = HA_PUSH_DEFAULT_PORT;
+                    if (port_obj && port_obj->type == cJSON_String && port_obj->valuestring) {
+                        port = atoi(port_obj->valuestring);
+                    } else if (port_obj && port_obj->type == cJSON_Number) {
+                        port = port_obj->valueint;
+                    }
+                    ha_push_set_target(addr_obj->valuestring, (uint16_t)port);
+                    printf("[BLUFI] push target set: %s:%d\n", addr_obj->valuestring, port);
+                } else {
+                    ha_push_clear();
+                    printf("[BLUFI] no addr in tcp object, push cleared\n");
+                }
+            } else {
+                ha_push_clear();
+                printf("[BLUFI] no tcp object, push cleared\n");
+            }
+            cJSON_Delete(root);
         }
+
         axk_blufi_send_custom_data(param->custom_data.data, param->custom_data.data_len);
         break;
     }

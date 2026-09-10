@@ -1,69 +1,84 @@
 # switch — 3 路智能开关固件
 
-基于 Ai-WB2(BL602) 的 3 路继电器开关固件,支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。
+基于 Ai-WB2（BL602）的 3 路继电器开关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。
+
+**当前版本: 0.10.0**
 
 ## 硬件连接
 
 | 通道 | GPIO | 说明 |
 |------|------|------|
-| 开关 1 | 3 | 继电器控制(默认高电平有效) |
+| 开关 1 | 3 | 继电器控制（默认高电平有效） |
 | 开关 2 | 14 | 继电器控制 |
 | 开关 3 | 17 | 继电器控制 |
 
-- 继电器极性:`RELAY_ACTIVE_HIGH=1`(高电平吸合)
-- 通道数:`SWITCH_COUNT=3`
+- 继电器极性：`RELAY_ACTIVE_HIGH=1`（高电平吸合）
+- 通道数：`SWITCH_COUNT=3`
 
 ## 文件说明
 
 | 文件 | 说明 |
 |------|------|
-| `main.c` | 应用入口,WiFi 事件处理,`ha_device_t` 注册 |
-| `switch_handler.c/h` | 设备回调: `get_state` 返回 `"model","count","names","on","on1","on2"` |
-| `relay.c/h` | 继电器底层驱动(GPIO 初始化/设置/读取) |
-| `store.c/h` | WiFi 凭据持久化(EasyFlash) |
+| `main.c` | 应用入口，WiFi 事件处理，`ha_device_t` 注册 |
+| `switch_handler.c/h` | 设备回调：`get_device` 返回实体定义，`get_state` 返回实体状态 |
+| `relay.c/h` | 继电器底层驱动（GPIO 初始化/设置/读取） |
+| `store.c/h` | WiFi 凭据持久化（EasyFlash） |
 | `wifi_sta.c/h` | WiFi STA 连接管理 |
 | `blufi_app.c/h` | BLE BluFi 配网模块 |
-| `app_config.h` | 设备配置(引脚/端口/名称/极性) |
+| `app_config.h` | 设备配置（引脚/端口/名称/极性） |
 
-## TCP 协议
+## TCP 协议（v2）
 
-端口: **9100**
+端口：**9100**
 
-查询:
+### 获取设备信息
+
 ```json
-{"cmd":"get"}
+{"cmd":"get_device"}
 ```
 
-响应:
+响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"sw","name":"智能开关","model":"Ai-WB2-12F",
- "count":3,"names":["开关1","开关2","开关3"],
- "on":0,"on1":0,"on2":0}
+{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"0.10.0",
+ "entities":[
+   {"id":"ACD8297A605D_001","type":"switch","name":"开关1","icon":"mdi:toggle-switch"},
+   {"id":"ACD8297A605D_002","type":"switch","name":"开关2","icon":"mdi:toggle-switch"},
+   {"id":"ACD8297A605D_003","type":"switch","name":"开关3","icon":"mdi:toggle-switch"}
+ ]}
 ```
 
-控制:
+### 获取状态
+
 ```json
-{"cmd":"set","on":1}        // 开启通道 1
-{"cmd":"set","on1":0}       // 关闭通道 2
-{"cmd":"set","on2":1}       // 开启通道 3
+{"cmd":"get_state"}
 ```
 
-支持同时控制多通道:
+响应：
 ```json
-{"cmd":"set","on":1,"on1":1,"on2":0}
+{"state":"online","entities":[
+  {"id":"ACD8297A605D_001","type":"switch","on":0},
+  {"id":"ACD8297A605D_002","type":"switch","on":1},
+  {"id":"ACD8297A605D_003","type":"switch","on":0}
+]}
 ```
 
-## 字段说明
+### 控制
 
-| 字段 | 说明 |
-|------|------|
-| `count` | 继电器通道数(由 `SWITCH_COUNT` 定义) |
-| `names` | 各通道名称数组(由 `SWITCH_NAMES` 定义) |
-| `on` | 通道 1 状态(0=关/1=开) |
-| `on1` | 通道 2 状态 |
-| `on2` | 通道 3 状态 |
+```json
+{"cmd":"set","id":"ACD8297A605D_001","on":1}       // 开启开关 1
+{"cmd":"set","id":"ACD8297A605D_002","on":0}       // 关闭开关 2
+```
 
-> 通道字段命名规则:第 1 通道为 `on`,第 2 通道起为 `on1`,`on2`,以此类推。
+### 推送
+
+设备连接 HA 的 9101 端口，推送所有开关状态：
+```json
+{"entities":[
+  {"id":"ACD8297A605D_001","type":"switch","on":1},
+  {"id":"ACD8297A605D_002","type":"switch","on":0},
+  {"id":"ACD8297A605D_003","type":"switch","on":0}
+]}
+```
 
 ## 编译
 
@@ -75,7 +90,7 @@ make -j4
 
 ## 配置
 
-所有配置在 `switch/switch/app_config.h`:
+所有配置在 `switch/switch/app_config.h`：
 
 ```c
 #define SWITCH_PINS        {3, 14, 17}       // 各通道 GPIO
@@ -84,7 +99,8 @@ make -j4
 #define SWITCH_NAMES       {"开关1", "开关2", "开关3"}  // 通道名称
 
 #define TCP_SERVER_PORT    9100
-#define DEVICE_TYPE        "sw"
+#define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "智能开关"
 #define DEVICE_MODEL       "Ai-WB2-12F"
+#define DEVICE_SW_VERSION  "0.10.0"
 ```

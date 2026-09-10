@@ -36,6 +36,15 @@ uint8_t ha_push_enabled(void)
     return s_push_enabled;
 }
 
+void ha_push_clear(void)
+{
+    s_push_enabled = 0;
+    memset(&s_ha_ip, 0, sizeof(s_ha_ip));
+    s_ha_port = HA_PUSH_DEFAULT_PORT;
+    store_push_clear();
+    printf("[PUSH] push disabled and config cleared\n");
+}
+
 void ha_push_send(const char *json)
 {
     struct netconn *conn;

@@ -12,9 +12,13 @@
 typedef struct {
     const char *type;                     /* device type reported to HA, e.g. "wb2" */
     const char *name;                     /* device name reported to HA, e.g. "彩灯" */
+    const char *model;                    /* device model, e.g. "Ai-WB2-12F" */
+    const char *sw_version;               /* firmware version, e.g. "0.10.0" */
     int port;                             /* TCP listen port, e.g. 9100 */
-    int (*get_state)(char *buf, int buf_len);   /* fill device state fields only (no braces) */
-    int (*set_state)(const char *cmd_json);     /* parse and apply a "cmd":"set" request */
+    int (*get_device)(char *buf, int buf_len);  /* fill device info + entity definitions (no outer braces) */
+    int (*get_state)(char *buf, int buf_len);   /* fill entity state fields only (no braces) */
+    int (*set_state)(const char *cmd_json);     /* parse and apply a "cmd" request */
+    void (*log)(const char *msg);               /* project-specific log output, e.g. uart_433_log */
 } ha_device_t;
 
 /*

@@ -19,7 +19,10 @@
 static const ha_device_t ha_dev = {
     .type = DEVICE_TYPE,
     .name = DEVICE_NAME,
+    .model = DEVICE_MODEL,
+    .sw_version = DEVICE_SW_VERSION,
     .port = TCP_SERVER_PORT,
+    .get_device = led_handler_get_device,
     .get_state = led_handler_get_state,
     .set_state = led_handler_set_state,
 };

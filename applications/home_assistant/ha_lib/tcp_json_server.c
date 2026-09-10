@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include <lwip/api.h>
@@ -14,14 +15,28 @@
 
 static const ha_device_t *s_dev;
 
-static void respond_state(struct netconn *conn)
+static void tcp_log(const char *fmt, ...)
+{
+    char buf[512];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+    if (s_dev->log) {
+        s_dev->log(buf);
+    } else {
+        blog_info("%s", buf);
+    }
+}
+
+static void respond_device(struct netconn *conn)
 {
     uint8_t mac[6];
-    char line[256];
-    char dev[192];
+    char line[512];
+    char dev[384];
     int n;
 
-    if (s_dev->get_state(dev, sizeof(dev)) < 0) {
+    if (s_dev->get_device == NULL || s_dev->get_device(dev, sizeof(dev)) < 0) {
         dev[0] = '\0';
     }
     if (wifi_mgmr_sta_mac_get(mac) != 0) {
@@ -29,24 +44,52 @@ static void respond_state(struct netconn *conn)
     }
     n = snprintf(line, sizeof(line),
                  "{\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
-                 "\"type\":\"%s\",\"name\":\"%s\",%s}",
+                 "\"name\":\"%s\",\"model\":\"%s\",\"sw_version\":\"%s\",%s}",
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
-                 s_dev->type, s_dev->name, dev);
+                 s_dev->name, s_dev->model, s_dev->sw_version, dev);
     netconn_write(conn, line, n, NETCONN_NOCOPY);
     netconn_write(conn, "\r\n", 2, NETCONN_NOCOPY);
+    tcp_log("[TCP] send get_device: %s", line);
+}
+
+static void respond_state(struct netconn *conn)
+{
+    char line[512];
+    char dev[384];
+    int n;
+
+    if (s_dev->get_state == NULL || s_dev->get_state(dev, sizeof(dev)) < 0) {
+        dev[0] = '\0';
+    }
+    n = snprintf(line, sizeof(line), "{\"state\":\"online\"%s%s}",
+                 dev[0] ? "," : "", dev);
+    netconn_write(conn, line, n, NETCONN_NOCOPY);
+    netconn_write(conn, "\r\n", 2, NETCONN_NOCOPY);
+    tcp_log("[TCP] send get_state: %s", line);
 }
 
 static void handle_request(struct netconn *conn, const char *buf)
 {
+    tcp_log("[TCP] recv: %s", buf);
+
     const char *cmd = ha_json_str(buf, "cmd");
 
-    if (cmd != NULL && strncmp(cmd, "set", 3) == 0) {
-        if (s_dev->set_state(buf) != 0) {
-            blog_info("[TCP] set failed");
-        }
+    if (cmd == NULL) {
+        return;
     }
 
-    respond_state(conn);
+    if (strcmp(cmd, "get_device") == 0) {
+        respond_device(conn);
+    } else if (strcmp(cmd, "get_state") == 0) {
+        respond_state(conn);
+    } else {
+        if (s_dev->set_state != NULL) {
+            if (s_dev->set_state(buf) != 0) {
+                tcp_log("[TCP] set failed");
+            }
+        }
+        respond_state(conn);
+    }
 }
 
 static void handle_conn(struct netconn *conn)
@@ -110,25 +153,25 @@ static struct netconn *server_listen(void)
 
     conn = netconn_new(NETCONN_TCP);
     if (conn == NULL) {
-        blog_info("[TCP] netconn_new failed");
+        tcp_log("[TCP] netconn_new failed");
         return NULL;
     }
 
     if (netconn_bind(conn, IP_ADDR_ANY, s_dev->port) != ERR_OK) {
-        blog_info("[TCP] bind %d failed", s_dev->port);
+        tcp_log("[TCP] bind %d failed", s_dev->port);
         netconn_close(conn);
         netconn_delete(conn);
         return NULL;
     }
 
     if (netconn_listen(conn) != ERR_OK) {
-        blog_info("[TCP] listen failed");
+        tcp_log("[TCP] listen failed");
         netconn_close(conn);
         netconn_delete(conn);
         return NULL;
     }
 
-    blog_info("[TCP] listening on port %d", s_dev->port);
+    tcp_log("[TCP] listening on port %d", s_dev->port);
     return conn;
 }
 
@@ -149,7 +192,7 @@ void ha_tcp_server_start(void *pvParameters)
         if (err == ERR_OK) {
             handle_conn(client);
         } else {
-            blog_info("[TCP] accept err=%d, recreate listener", err);
+            tcp_log("[TCP] accept err=%d, recreate listener", err);
             netconn_close(listen);
             netconn_delete(listen);
             while ((listen = server_listen()) == NULL) {

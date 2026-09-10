@@ -10,6 +10,9 @@ void ha_push_init(void);
 /* Set HA target IP and port, save to NVS. */
 void ha_push_set_target(const char *ip, uint16_t port);
 
+/* Clear push config and disable push. */
+void ha_push_clear(void);
+
 /* Send JSON state to HA via TCP (non-blocking, fails silently). */
 void ha_push_send(const char *json);
 

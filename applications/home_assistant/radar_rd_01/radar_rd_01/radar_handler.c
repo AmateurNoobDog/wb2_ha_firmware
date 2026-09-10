@@ -10,46 +10,79 @@
 #include "cmdprocess.h"
 #include "banyan.h"
 #include "AlgorithmConfig.h"
+#include <wifi_mgmr_ext.h>
 
 static uint8_t g_radar_motion = 0;
 static uint32_t g_state_call_count = 0;
 static uint32_t g_motion_call_count = 0;
 
+void gen_entity_id(char *buf, int buf_len, const uint8_t *mac, int seq)
+{
+    snprintf(buf, buf_len, "%02X%02X%02X%02X%02X%02X_%03d",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], seq);
+}
+
 void radar_handler_init(void)
 {
+}
+
+int radar_handler_get_device(char *buf, int buf_len)
+{
+    uint8_t mac[6];
+    char id[20];
+    int used = 0;
+
+    if (wifi_mgmr_sta_mac_get(mac) != 0) {
+        memset(mac, 0, sizeof(mac));
+    }
+
+    used += snprintf(buf + used, buf_len - used, "\"entities\":[");
+
+    gen_entity_id(id, sizeof(id), mac, 1);
+    used += snprintf(buf + used, buf_len - used,
+                     "{\"id\":\"%s\",\"type\":\"binary_sensor\",\"name\":\"有人\","
+                     "\"icon\":\"mdi:motion-sensor\"}", id);
+
+    gen_entity_id(id, sizeof(id), mac, 2);
+    used += snprintf(buf + used, buf_len - used,
+                     ",{\"id\":\"%s\",\"type\":\"binary_sensor\",\"name\":\"运动\","
+                     "\"icon\":\"mdi:run-fast\"}", id);
+
+    gen_entity_id(id, sizeof(id), mac, 3);
+    used += snprintf(buf + used, buf_len - used,
+                     ",{\"id\":\"%s\",\"type\":\"button\",\"name\":\"标定无人\","
+                     "\"icon\":\"mdi:cog-counterclockwise\",\"action\":\"calibrate\"}", id);
+
+    gen_entity_id(id, sizeof(id), mac, 4);
+    used += snprintf(buf + used, buf_len - used,
+                     ",{\"id\":\"%s\",\"type\":\"button\",\"name\":\"恢复默认参数\","
+                     "\"icon\":\"mdi:restore\",\"action\":\"restore\"}", id);
+
+    used += snprintf(buf + used, buf_len - used, "]");
+    return used;
 }
 
 int radar_handler_get_state(char *buf, int buf_len)
 {
     g_state_call_count++;
-#if RADAR_GATE_DATA_ENABLE
+    uint8_t mac[6];
+    char id1[20], id2[20];
+
+    if (wifi_mgmr_sta_mac_get(mac) != 0) {
+        memset(mac, 0, sizeof(mac));
+    }
+    gen_entity_id(id1, sizeof(id1), mac, 1);
+    gen_entity_id(id2, sizeof(id2), mac, 2);
+
+    int presence = (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0;
+    int motion = (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0;
+
     return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"motion\":%d,\"on\":%d,"
-                    "\"g0\":%d,\"g1\":%d,\"g2\":%d,\"g3\":%d,"
-                    "\"g4\":%d,\"g5\":%d,\"g6\":%d,\"g7\":%d,"
-                    "\"scnt\":%lu,\"mcnt\":%lu",
-                    DEVICE_MODEL, g_radar_motion, g_radar_motion,
-                    NormalDopplerMaxVal[1], NormalDopplerMaxVal[2],
-                    NormalDopplerMaxVal[3], NormalDopplerMaxVal[4],
-                    NormalDopplerMaxVal[5], NormalDopplerMaxVal[6],
-                    NormalDopplerMaxVal[7], NormalDopplerMaxVal[8],
-                    (unsigned long)g_state_call_count,
-                    (unsigned long)g_motion_call_count);
-#elif RADAR_DEBUG_COUNTER_ENABLE
-    return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"motion\":%d,\"on\":%d,"
-                    "\"scnt\":%lu,\"mcnt\":%lu",
-                    DEVICE_MODEL, g_radar_motion, g_radar_motion,
-                    (unsigned long)g_state_call_count,
-                    (unsigned long)g_motion_call_count);
-#else
-    return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"sw_version\":\"%s\",\"motion\":%d,\"presence\":%d,\"push\":%d",
-                    DEVICE_MODEL, DEVICE_SW_VERSION,
-                    (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0,
-                    (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0,
-                    ha_push_enabled());
-#endif
+                    "\"entities\":["
+                    "{\"id\":\"%s\",\"type\":\"binary_sensor\",\"value\":%d},"
+                    "{\"id\":\"%s\",\"type\":\"binary_sensor\",\"value\":%d}"
+                    "]",
+                    id1, presence, id2, motion);
 }
 
 int radar_handler_calibrate(void)
@@ -119,13 +152,13 @@ int radar_handler_set_state(const char *cmd_json)
     if (cmd == NULL)
         return -1;
 
-    if (strncmp(cmd, "calibrate", 9) == 0) {
+    if (strcmp(cmd, "calibrate") == 0) {
         return radar_handler_calibrate();
     }
-    if (strncmp(cmd, "restore", 7) == 0) {
+    if (strcmp(cmd, "restore") == 0) {
         return radar_handler_restore_defaults();
     }
-    if (strncmp(cmd, "push_cfg", 8) == 0) {
+    if (strcmp(cmd, "push_cfg") == 0) {
         const char *ip = ha_json_str(cmd_json, "ip");
         int port = ha_json_int(cmd_json, "port", HA_PUSH_DEFAULT_PORT);
         if (ip) {

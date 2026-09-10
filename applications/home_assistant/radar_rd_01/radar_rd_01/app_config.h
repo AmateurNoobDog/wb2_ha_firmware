@@ -13,7 +13,7 @@
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "\xE9\x9B\xB7\xE8\xBE\xBE"  // "雷达" UTF-8
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.9.1"
+#define DEVICE_SW_VERSION     "0.10.0"
 
 // Reboot provisioning detection
 #define REBOOT_PROVISION_COUNT  3

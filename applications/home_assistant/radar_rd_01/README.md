@@ -4,7 +4,7 @@
 固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
 通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
-**当前版本: 0.8.0**
+**当前版本: 0.10.0**
 
 ## 硬件连接
 
@@ -38,7 +38,7 @@
 | 文件 | 说明 |
 |------|------|
 | `main.c` | 应用入口,WiFi 事件处理,`ha_device_t` 注册,雷达数据回调 |
-| `radar_handler.c/h` | 设备回调: `get_state` 返回 `"model","sw_version","motion","presence","push"` |
+| `radar_handler.c/h` | 设备回调：`get_device` 返回实体定义，`get_state` 返回运动/存在状态 |
 | `store.c/h` | WiFi 凭据 + 推送配置持久化(EasyFlash) |
 | `wifi_sta.c/h` | WiFi STA 连接管理 |
 | `blufi_app.c/h` | BLE BluFi 配网模块(支持自定义数据接收 HA IP) |
@@ -49,26 +49,57 @@
 | `hal_wifi/` | WiFi HAL 层 |
 | `axk_cfg/` | 配置管理库 |
 
-## TCP 协议
+## TCP 协议（v2）
 
-端口: **9100**
+端口：**9100**
 
-查询:
+### 获取设备信息
+
 ```json
-{"cmd":"get"}
+{"cmd":"get_device"}
 ```
 
-响应(默认模式):
+响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","type":"radar","name":"雷达","model":"RD-01","sw_version":"0.8.0",
- "motion":0,"presence":0,"push":0}
+{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"0.10.0",
+ "entities":[
+   {"id":"ACD8297A605D_001","type":"binary_sensor","name":"运动检测","icon":"mdi:motion-sensor"},
+   {"id":"ACD8297A605D_002","type":"binary_sensor","name":"存在检测","icon":"mdi:human-greeting"},
+   {"id":"ACD8297A605D_003","type":"button","name":"校准","icon":"mdi:target","action":"calibrate"},
+   {"id":"ACD8297A605D_004","type":"button","name":"恢复默认","icon":"mdi:restore","action":"restore"}
+ ]}
 ```
 
-控制:
+### 获取状态
+
 ```json
-{"cmd":"calibrate"}       // 标定无人(校准阈值)
+{"cmd":"get_state"}
+```
+
+响应：
+```json
+{"state":"online","entities":[
+  {"id":"ACD8297A605D_001","type":"binary_sensor","value":0},
+  {"id":"ACD8297A605D_002","type":"binary_sensor","value":1}
+]}
+```
+
+### 控制命令
+
+```json
+{"cmd":"calibrate"}       // 标定无人（校准阈值）
 {"cmd":"restore"}         // 恢复默认参数
 {"cmd":"push_cfg","ip":"192.168.1.100","port":9101}  // 配置推送目标
+```
+
+### 推送
+
+设备主动推送运动/存在状态到 HA 的 9101 端口：
+```json
+{"entities":[
+  {"id":"ACD8297A605D_001","type":"binary_sensor","value":1},
+  {"id":"ACD8297A605D_002","type":"binary_sensor","value":1}
+]}
 ```
 
 ### motion 与 presence 的区别
@@ -130,7 +161,7 @@ make -j6
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.8.0"
+#define DEVICE_SW_VERSION     "0.10.0"
 
 // 推送配置
 #define HA_PUSH_DEFAULT_PORT  9101    // HA 推送监听端口

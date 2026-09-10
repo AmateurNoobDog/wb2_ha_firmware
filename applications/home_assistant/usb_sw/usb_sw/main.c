@@ -77,7 +77,7 @@ static void boot_mode(void)
 void main(void)
 {
     relay_init();
-    puts("[OS] switch starting...");
+    puts("[OS] usb_sw starting...");
     tcpip_init(NULL, NULL);
     boot_mode();
     puts("[OS] main exit");

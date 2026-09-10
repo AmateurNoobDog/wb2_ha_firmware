@@ -10,37 +10,77 @@
 #include "app_config.h"
 #include <wifi_mgmr_ext.h>
 
+static void gen_entity_id(char *buf, int buf_len, const uint8_t *mac, int seq)
+{
+    snprintf(buf, buf_len, "%02X%02X%02X%02X%02X%02X_%03d",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], seq);
+}
+
 static void led_push_state(void)
 {
     uint8_t mac[6];
-    char state[192];
-    char full_json[256];
+    char id[20];
+    char json[128];
+    uint8_t r, g, b, brightness;
 
     if (!ha_push_enabled()) {
         return;
     }
-    led_handler_get_state(state, sizeof(state));
+
+    led_get_state(&r, &g, &b, &brightness);
+
     if (wifi_mgmr_sta_mac_get(mac) != 0) {
         memset(mac, 0, sizeof(mac));
     }
-    snprintf(full_json, sizeof(full_json),
-             "{\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
-             "\"type\":\"%s\",\"name\":\"%s\",%s}",
-             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
-             DEVICE_TYPE, DEVICE_NAME, state);
-    ha_push_send(full_json);
+    gen_entity_id(id, sizeof(id), mac, 1);
+
+    snprintf(json, sizeof(json),
+             "{\"id\":\"%s\",\"type\":\"light\","
+             "\"r\":%d,\"g\":%d,\"b\":%d,\"brightness\":%d}",
+             id, r, g, b, brightness);
+    ha_push_send(json);
+}
+
+int led_handler_get_device(char *buf, int buf_len)
+{
+    uint8_t mac[6];
+    char id[20];
+    int used = 0;
+
+    if (wifi_mgmr_sta_mac_get(mac) != 0) {
+        memset(mac, 0, sizeof(mac));
+    }
+
+    used += snprintf(buf + used, buf_len - used, "\"entities\":[");
+
+    gen_entity_id(id, sizeof(id), mac, 1);
+    used += snprintf(buf + used, buf_len - used,
+                     "{\"id\":\"%s\",\"type\":\"light\",\"name\":\"彩灯\","
+                     "\"icon\":\"mdi:lightbulb\"}", id);
+
+    used += snprintf(buf + used, buf_len - used, "]");
+    return used;
 }
 
 int led_handler_get_state(char *buf, int buf_len)
 {
     uint8_t r, g, b, brightness;
+    uint8_t mac[6];
+    char id[20];
 
     led_get_state(&r, &g, &b, &brightness);
+
+    if (wifi_mgmr_sta_mac_get(mac) != 0) {
+        memset(mac, 0, sizeof(mac));
+    }
+    gen_entity_id(id, sizeof(id), mac, 1);
+
     return snprintf(buf, buf_len,
-                    "\"model\":\"%s\",\"sw_version\":\"%s\","
-                    "\"r\":%d,\"g\":%d,\"b\":%d,\"brightness\":%d,\"push\":%d",
-                    DEVICE_MODEL, DEVICE_SW_VERSION, r, g, b, brightness,
-                    ha_push_enabled());
+                    "\"entities\":["
+                    "{\"id\":\"%s\",\"type\":\"light\","
+                    "\"r\":%d,\"g\":%d,\"b\":%d,\"brightness\":%d}"
+                    "]",
+                    id, r, g, b, brightness);
 }
 
 int led_handler_set_state(const char *cmd_json)
@@ -50,7 +90,7 @@ int led_handler_set_state(const char *cmd_json)
     int v;
 
     const char *cmd = ha_json_str(cmd_json, "cmd");
-    if (cmd && strncmp(cmd, "push_cfg", 8) == 0) {
+    if (cmd && strcmp(cmd, "push_cfg") == 0) {
         const char *ip = ha_json_str(cmd_json, "ip");
         int port = ha_json_int(cmd_json, "port", HA_PUSH_DEFAULT_PORT);
         if (ip) {

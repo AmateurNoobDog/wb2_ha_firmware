@@ -11,7 +11,7 @@
 
 // Device identity
 #define DEVICE_TYPE           "radar"
-#define DEVICE_NAME           "\xE9\x9B\xB7\xE8\xBE\xBE"  // "雷达" UTF-8
+#define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
 #define DEVICE_SW_VERSION     "0.10.0"
 
@@ -40,5 +40,8 @@
 // Radar debug switches
 #define RADAR_GATE_DATA_ENABLE    0   // 门数据上报开关，1=开启，0=屏蔽
 #define RADAR_DEBUG_COUNTER_ENABLE 0  // 调试计数器开关，1=开启，0=屏蔽
+
+// 静止判定防抖：连续检测到几次无运动才判定为静止
+#define STATIONARY_CONFIRM_COUNT   10
 
 #endif /* __APP_CONFIG_H__ */

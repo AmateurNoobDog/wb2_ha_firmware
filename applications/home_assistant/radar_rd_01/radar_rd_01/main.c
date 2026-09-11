@@ -90,7 +90,9 @@ static void radar_data_forward(uint8_t *buff, uint16_t len)
 
     radar_handler_set_motion(motion);
 
-    if (motion != old_motion && ha_push_enabled()) {
+    uint8_t new_motion = radar_handler_get_motion();
+
+    if (new_motion != old_motion && ha_push_enabled()) {
         uint8_t mac[6];
         char id1[20], id2[20];
         char json[192];
@@ -102,7 +104,7 @@ static void radar_data_forward(uint8_t *buff, uint16_t len)
         gen_entity_id(id2, sizeof(id2), mac, 2);
 
         int presence = (motion >= 1 && motion <= 3) ? 1 : 0;
-        int motion_flag = (motion == 1 || motion == 3) ? 1 : 0;
+        int motion_flag = new_motion;  // 使用去抖后的 motion
 
         snprintf(json, sizeof(json),
                  "{\"entities\":["
@@ -259,7 +261,7 @@ int main(void)
     cs_interrupt_init();
     create_spi_init_task(bsp_spi_slave_init);
 
-    xTaskCreate(uart_recv_timeout_check_task, "uart_rec_check", 128, NULL, UART_RECV_CHECK_TASK_PRIORITY, NULL);
+    // xTaskCreate(uart_recv_timeout_check_task, "uart_rec_check", 128, NULL, UART_RECV_CHECK_TASK_PRIORITY, NULL);  // 注释掉UART超时检查任务
 
     hook_radar_callback();
 

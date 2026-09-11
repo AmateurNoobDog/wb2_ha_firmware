@@ -104,7 +104,7 @@ void bsp_uart0_init(void)
     hosal_uart_init(&uart_dev0);
 }
 
-// 通讯口
+// 通讯口 - 注释掉UART1初始化
 void bsp_uart_init(int uart_id, int baudrate)
 {
     // uint8_t tempbuf[] = "radar test\r\n";
@@ -113,22 +113,22 @@ void bsp_uart_init(int uart_id, int baudrate)
     //     .dma_buf_size = sizeof(tempbuf) - 1,
     // };
 
-    uart_dev_int.config.uart_id = uart_id;
-    uart_dev_int.config.baud_rate = baudrate;
-    /* Uart init device */
-    hosal_uart_init(&uart_dev_int);
+    // uart_dev_int.config.uart_id = uart_id;
+    // uart_dev_int.config.baud_rate = baudrate;
+    // /* Uart init device */
+    // hosal_uart_init(&uart_dev_int);
 
-    /* Set DMA TX RX transmission complete interrupt callback */
-    hosal_uart_callback_set(&uart_dev_int, HOSAL_UART_TX_DMA_CALLBACK,
-                          __uart_tx_dma_callback, &uart_dev_int);
+    // /* Set DMA TX RX transmission complete interrupt callback */
+    // hosal_uart_callback_set(&uart_dev_int, HOSAL_UART_TX_DMA_CALLBACK,
+    //                       __uart_tx_dma_callback, &uart_dev_int);
 
-    bl_uart_int_rx_notify_register(uart_dev_int.port, __uart_rx_callback, &uart_dev_int);
+    // bl_uart_int_rx_notify_register(uart_dev_int.port, __uart_rx_callback, &uart_dev_int);
 
-    // hosal_uart_ioctl(&uart_dev_int, HOSAL_UART_DMA_TX_START, &txdma_cfg);
+    // // hosal_uart_ioctl(&uart_dev_int, HOSAL_UART_DMA_TX_START, &txdma_cfg);
 
-    bl_uart_int_rx_enable(uart_dev_int.port);
-    bl_irq_register(UART1_IRQn, UART1_IRQHandler);
-    bl_irq_enable(UART1_IRQn);
+    // bl_uart_int_rx_enable(uart_dev_int.port);
+    // bl_irq_register(UART1_IRQn, UART1_IRQHandler);
+    // bl_irq_enable(UART1_IRQn);
 }
 
 

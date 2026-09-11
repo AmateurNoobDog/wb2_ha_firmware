@@ -67,6 +67,7 @@ void ha_push_send(const char *json)
         return;
     }
 
+    printf("[PUSH] sending: %s\n", json);
     netconn_write(conn, json, strlen(json), NETCONN_COPY);
     netconn_write(conn, "\n", 1, NETCONN_NOCOPY);
 

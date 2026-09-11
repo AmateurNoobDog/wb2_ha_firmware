@@ -32,8 +32,8 @@ static void tcp_log(const char *fmt, ...)
 static void respond_device(struct netconn *conn)
 {
     uint8_t mac[6];
-    char line[512];
-    char dev[384];
+    char line[768];
+    char dev[640];
     int n;
 
     if (s_dev->get_device == NULL || s_dev->get_device(dev, sizeof(dev)) < 0) {
@@ -54,8 +54,8 @@ static void respond_device(struct netconn *conn)
 
 static void respond_state(struct netconn *conn)
 {
-    char line[512];
-    char dev[384];
+    char line[768];
+    char dev[640];
     int n;
 
     if (s_dev->get_state == NULL || s_dev->get_state(dev, sizeof(dev)) < 0) {

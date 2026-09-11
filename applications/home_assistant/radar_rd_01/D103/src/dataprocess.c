@@ -487,15 +487,15 @@ void clearFrameLsatChirpDataFinished(void)
 // 没用到
 void SendResultData(uint8_t * buf, uint16_t size)
 {
-    if (g_uartDmaSendingFlag)
-    {
-        Indicator_RadarDataSendOverFlow();
-    }
-    else
-    {
-        g_uartDmaSendingFlag = 1;
-        uart_dma_send(buf, size);
-    }
+    // if (g_uartDmaSendingFlag)
+    // {
+    //     Indicator_RadarDataSendOverFlow();
+    // }
+    // else
+    // {
+    //     g_uartDmaSendingFlag = 1;
+    //     uart_dma_send(buf, size);  // 注释掉UART发送
+    // }
 }
 
 static void OneRecursiveCanceller_for_ft(COMPLEX16_T *range_chirp, uint8_t start_pos, uint8_t num, uint8_t shift)
@@ -621,9 +621,9 @@ static void DoFactoryTestDataSend(uint8_t* frameBuf, uint16_t bufLen, uint16_t i
         frameBuf[(ONEFFT_POINT-1)*4+3+4] = (u16_real & 0x00FF) >> 0;
 
         /* Send data */
-        while(1 == g_uartDmaSendingFlag){}
-        g_uartDmaSendingFlag = 1;
-        uart_dma_send(frameBuf, bufLen);
+        // while(1 == g_uartDmaSendingFlag){}
+        // g_uartDmaSendingFlag = 1;
+        // uart_dma_send(frameBuf, bufLen);  // 注释掉UART发送
 
         memset(factory_test_chirp_power, 0, sizeof(factory_test_chirp_power));
     }

@@ -793,7 +793,7 @@ void DoExitWakeUpACK(void)
     ackLen = FillCmdAck(start_cfg_ack, ARRAY_SIZE(start_cfg_ack), START_CFG_CMD, ACK_OK);
 
     //  UART0_DmaSend(CmdAck, ackLen);
-    uart_dma_send(CmdAck, ackLen);
+    // uart_dma_send(CmdAck, ackLen);  // 注释掉UART发送
 }
 
 void CmdProc_InCmdModeClear(void)
@@ -1020,22 +1020,22 @@ static void CmdExec(CMD_T *cmd, uint32_t cmdLen)
             if (ret != 0)
             {
                 printf("AMPS read result failed!\r\n");
-                uart_dma_send((uint8_t *)"\r\nRESULT FAILED\r\n", strlen("\r\nRESULT FAILED\r\n"));
+                // uart_dma_send((uint8_t *)"\r\nRESULT FAILED\r\n", strlen("\r\nRESULT FAILED\r\n"));  // 注释掉UART发送
             }
             else
             {
                 printf("AMPS read result:%d\r\n", temp_result);
 
-                while(1 == g_uartDmaSendingFlag){}
-                g_uartDmaSendingFlag = 1;
+                // while(1 == g_uartDmaSendingFlag){}
+                // g_uartDmaSendingFlag = 1;
 
                 if (temp_result == 1)
                 {
-                    uart_dma_send((uint8_t *)"\r\nRESULT OK\r\n", strlen("\r\nRESULT OK\r\n"));
+                    // uart_dma_send((uint8_t *)"\r\nRESULT OK\r\n", strlen("\r\nRESULT OK\r\n"));  // 注释掉UART发送
                 }
                 else
                 {
-                    uart_dma_send((uint8_t *)"\r\nRESULT FAILED\r\n", strlen("\r\nRESULT FAILED\r\n"));
+                    // uart_dma_send((uint8_t *)"\r\nRESULT FAILED\r\n", strlen("\r\nRESULT FAILED\r\n"));  // 注释掉UART发送
                 }
             }
             CmdModeFlag = 0;
@@ -1049,9 +1049,9 @@ static void CmdExec(CMD_T *cmd, uint32_t cmdLen)
 	
     if (ackLen > 0)
     {
-        while(1 == g_uartDmaSendingFlag){}
-        g_uartDmaSendingFlag = 1;
-        uart_dma_send(CmdAck, ackLen);
+        // while(1 == g_uartDmaSendingFlag){}
+        // g_uartDmaSendingFlag = 1;
+        // uart_dma_send(CmdAck, ackLen);  // 注释掉UART发送
 
 		if(cmd->cmdType == FINISH_CFG_CMD)
 		{

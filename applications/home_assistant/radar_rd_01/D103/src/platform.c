@@ -112,7 +112,7 @@ void Platform_Init(void)
     RegisterI2CWriteCallback(I2C_Write);
     RegisterI2CReadCallback(I2C_Read);
 #endif
-    bsp_uart_init(1, 256000);
+    // bsp_uart_init(1, 256000);  // 注释掉UART1初始化
     bsp_hosal_i2c_master_init(14, 3);
 
     radar_en_gpio_init(1);

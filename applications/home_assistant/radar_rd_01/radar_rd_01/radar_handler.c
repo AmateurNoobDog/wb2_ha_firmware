@@ -13,6 +13,7 @@
 #include <wifi_mgmr_ext.h>
 
 static uint8_t g_radar_motion = 0;
+static uint8_t g_stationary_count = 0;  // 连续静止计数
 static uint32_t g_state_call_count = 0;
 static uint32_t g_motion_call_count = 0;
 
@@ -75,7 +76,7 @@ int radar_handler_get_state(char *buf, int buf_len)
     gen_entity_id(id2, sizeof(id2), mac, 2);
 
     int presence = (g_radar_motion >= 1 && g_radar_motion <= 3) ? 1 : 0;
-    int motion = (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0;
+    int motion = radar_handler_get_motion();  // 使用去抖后的 motion
 
     return snprintf(buf, buf_len,
                     "\"entities\":["
@@ -173,9 +174,22 @@ void radar_handler_set_motion(uint8_t motion)
 {
     g_radar_motion = motion;
     g_motion_call_count++;
+
+    // 静止防抖：连续检测到无运动才计数
+    if (motion == 2) {
+        if (g_stationary_count < STATIONARY_CONFIRM_COUNT) {
+            g_stationary_count++;
+        }
+    } else {
+        g_stationary_count = 0;  // 有运动时重置计数
+    }
 }
 
 uint8_t radar_handler_get_motion(void)
 {
-    return g_radar_motion;
+    // 连续静止次数未达到阈值时，仍判定为有运动
+    if (g_radar_motion == 2 && g_stationary_count < STATIONARY_CONFIRM_COUNT) {
+        return 1;  // 还没确认静止，保持 motion=1
+    }
+    return (g_radar_motion == 1 || g_radar_motion == 3) ? 1 : 0;
 }

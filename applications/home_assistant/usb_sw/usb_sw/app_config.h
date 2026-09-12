@@ -12,7 +12,7 @@
 #define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "USB通断器"
 #define DEVICE_MODEL       "Ai-WB2-01S"
-#define DEVICE_SW_VERSION  "0.10.0"
+#define DEVICE_SW_VERSION  "1.0.0"
 
 #define STORE_KEY_SSID     "ROUTER_SSID"
 #define STORE_KEY_PWD      "ROUTER_PWD"

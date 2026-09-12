@@ -2,7 +2,7 @@
 
 基于 Ai-WB2（BL602）的单路 USB 通断器固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。
 
-**当前版本: 0.10.0**
+**当前版本: 1.0.0**
 
 ## 硬件连接
 
@@ -37,7 +37,7 @@
 
 响应：
 ```json
-{"mac":"7C:B9:4C:D4:5B:0B","name":"USB通断器","model":"Ai-WB2-01S","sw_version":"0.10.0",
+{"mac":"7C:B9:4C:D4:5B:0B","name":"USB通断器","model":"Ai-WB2-01S","sw_version":"1.0.0",
  "entities":[
    {"id":"7CB94CD45B0B_001","type":"switch","name":"USB","icon":"mdi:toggle-switch"}
  ]}
@@ -94,7 +94,7 @@ make -j4
 #define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "USB通断器"
 #define DEVICE_MODEL       "Ai-WB2-01S"
-#define DEVICE_SW_VERSION  "0.10.0"
+#define DEVICE_SW_VERSION  "1.0.0"
 ```
 
 ## 配网

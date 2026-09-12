@@ -2,7 +2,7 @@
 
 433MHz 遥控接收器网关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制 + Push 推送。
 
-**当前版本: 0.10.0**
+**当前版本: 1.0.0**
 
 ## 硬件连接
 
@@ -34,7 +34,7 @@
 
 响应：
 ```json
-{"mac":"7C:B9:4C:D1:F7:67","name":"433网关","model":"Ai-WB2-12F","sw_version":"0.10.0",
+{"mac":"7C:B9:4C:D1:F7:67","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.0.0",
  "entities":[
    {"id":"7CB94CD1F767_001","type":"button","name":"配对","icon":"mdi:remote","action":"pair"},
    {"id":"7CB94CD1F767_002","type":"button","name":"重置","icon":"mdi:restore","action":"reset"},
@@ -94,7 +94,7 @@ make -j4
 #define DEVICE_TYPE        "event"
 #define DEVICE_NAME        "433网关"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "0.10.0"
+#define DEVICE_SW_VERSION  "1.0.0"
 #define HA_PUSH_DEFAULT_PORT  9101
 ```
 

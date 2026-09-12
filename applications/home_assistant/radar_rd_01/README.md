@@ -4,7 +4,7 @@
 固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
 通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
-**当前版本: 0.10.0**
+**当前版本: 1.0.0**
 
 ## 硬件连接
 
@@ -61,7 +61,7 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"0.10.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"1.0.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"运动检测","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"binary_sensor","name":"存在检测","icon":"mdi:human-greeting"},
@@ -161,7 +161,7 @@ make -j6
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.10.0"
+#define DEVICE_SW_VERSION     "1.0.0"
 
 // 推送配置
 #define HA_PUSH_DEFAULT_PORT  9101    // HA 推送监听端口

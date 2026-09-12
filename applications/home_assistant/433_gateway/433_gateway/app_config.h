@@ -18,7 +18,7 @@
 #define DEVICE_TYPE          "event"
 #define DEVICE_NAME          "433\xE7\xBD\x91\xE5\x85\xB3"
 #define DEVICE_MODEL         "Ai-WB2-12F"
-#define DEVICE_SW_VERSION    "0.10.0"
+#define DEVICE_SW_VERSION    "1.0.0"
 
 /* Store keys */
 #define STORE_KEY_SSID       "ROUTER_SSID"

@@ -2,7 +2,7 @@
 
 基于 Ai-WB2（BL602）的 3 路继电器开关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。
 
-**当前版本: 0.10.0**
+**当前版本: 1.0.0**
 
 ## 硬件连接
 
@@ -39,7 +39,7 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"0.10.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.0.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"开关1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"开关2","icon":"mdi:toggle-switch"},
@@ -102,5 +102,5 @@ make -j4
 #define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "智能开关"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "0.10.0"
+#define DEVICE_SW_VERSION  "1.0.0"
 ```

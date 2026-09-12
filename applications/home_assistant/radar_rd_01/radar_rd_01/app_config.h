@@ -13,7 +13,7 @@
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "0.10.0"
+#define DEVICE_SW_VERSION     "1.0.0"
 
 // Reboot provisioning detection
 #define REBOOT_PROVISION_COUNT  3

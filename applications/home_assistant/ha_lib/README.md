@@ -21,7 +21,7 @@ typedef struct {
     const char *type;                     // 设备类型，如 "light"/"switch"/"radar"/"event"
     const char *name;                     // 设备名称，如 "彩灯"/"智能开关"/"433网关"
     const char *model;                    // 设备型号，如 "Ai-WB2-12F"/"RD-01"
-    const char *sw_version;               // 固件版本，如 "0.10.0"
+    const char *sw_version;               // 固件版本，如 "1.0.0"
     int port;                             // TCP 监听端口，默认 9100
     int (*get_device)(char *buf, int buf_len);  // 填充实体定义（不含花括号）
     int (*get_state)(char *buf, int buf_len);   // 填充实体状态（不含花括号）

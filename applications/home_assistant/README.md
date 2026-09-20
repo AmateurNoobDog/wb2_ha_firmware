@@ -59,14 +59,9 @@ make -j4
 
 ### 3. 烧录
 
-直接串口（以 switch 为例）：
-
 ```bash
-cd <SDK>/tools/flash_tool
-./bflb_iot_tool-ubuntu --chipname=BL602 --baudrate=921600 --port=/dev/ttyUSB0 \
-  --pt=<project>/img_conf/partition_cfg_2M.toml \
-  --dts=<project>/img_conf/bl_factory_params_IoTKitA_40M.dts \
-  --firmware=<project>/build_out/switch.bin
+cd applications/home_assistant/switch   # 或 light, radar_rd_01, 433_gateway, usb_sw, tts
+make flash SERIAL_PORT=/dev/ttyUSB0
 ```
 
 ### 4. 配网

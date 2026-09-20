@@ -215,5 +215,5 @@ Home Assistant discovers devices on the local network via zeroconf.
 
 ## Related Repositories
 
-- Firmware repository: [amateur-dog/wb2_ha_firmware](https://gitee.com/amateur-dog/wb2_ha_firmware)
+- Firmware repository: [AmateurNoobDog/wb2_ha_firmware](https://gitee.com/AmateurNoobDog/wb2_ha_firmware)
 - Home Assistant integration: [AmateurNoobDog/and_home](https://gitee.com/AmateurNoobDog/and_home)

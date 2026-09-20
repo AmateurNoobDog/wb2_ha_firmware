@@ -4,7 +4,7 @@
 
 基于 [Ai-Thinker-WB2 (BL602)](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2) SDK 的智能家居应用固件。
 设备通过 WiFi 接入局域网，使用轻量 TCP JSON 协议与 Home Assistant 集成
-（配套集成见 [`ha_ai_thinker_home`](https://gitee.com/amateur-dog/ha_ai_thinker_home)）。
+（配套集成见 [`and_home`](https://gitee.com/AmateurNoobDog/and_home)）。
 
 **当前版本: 1.0.0**
 
@@ -45,7 +45,7 @@ applications/home_assistant/
 ```bash
 git clone --recursive https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2.git
 cd Ai-Thinker-WB2/applications
-git clone git@gitee.com:amateur-dog/wb2_ha_firmware.git home_assistant
+git clone git@gitee.com:AmateurNoobDog/wb2_ha_firmware.git home_assistant
 ```
 
 ### 2. 编译
@@ -217,5 +217,5 @@ Home Assistant 通过 zeroconf 自动发现局域网内的设备。
 
 ## 相关仓库
 
-- 固件仓库：[amateur-dog/wb2_ha_firmware](https://gitee.com/amateur-dog/wb2_ha_firmware)
-- Home Assistant 集成：[amateur-dog/ha_ai_thinker_home](https://gitee.com/amateur-dog/ha_ai_thinker_home)
+- 固件仓库：[AmateurNoobDog/wb2_ha_firmware](https://gitee.com/AmateurNoobDog/wb2_ha_firmware)
+- Home Assistant 集成：[AmateurNoobDog/and_home](https://gitee.com/AmateurNoobDog/and_home)

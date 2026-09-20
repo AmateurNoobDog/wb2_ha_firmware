@@ -215,5 +215,5 @@ Home Assistant 通过 zeroconf 自动发现局域网内的设备。
 
 ## 相关仓库
 
-- 固件仓库：[amateur-dog/wb2_ha_firmware](https://gitee.com/amateur-dog/wb2_ha_firmware)
+- 固件仓库：[AmateurNoobDog/wb2_ha_firmware](https://gitee.com/AmateurNoobDog/wb2_ha_firmware)
 - Home Assistant 集成：[AmateurNoobDog/and_home](https://gitee.com/AmateurNoobDog/and_home)

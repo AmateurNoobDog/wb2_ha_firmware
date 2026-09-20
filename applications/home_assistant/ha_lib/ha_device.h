@@ -13,6 +13,7 @@ typedef struct {
     const char *type;                     /* device type reported to HA, e.g. "wb2" */
     const char *name;                     /* device name reported to HA, e.g. "彩灯" */
     const char *model;                    /* device model, e.g. "Ai-WB2-12F" */
+    const char *manufacturer;             /* manufacturer, e.g. "AND-DIY" */
     const char *sw_version;               /* firmware version, e.g. "0.10.0" */
     int port;                             /* TCP listen port, e.g. 9100 */
     int (*get_device)(char *buf, int buf_len);  /* fill device info + entity definitions (no outer braces) */

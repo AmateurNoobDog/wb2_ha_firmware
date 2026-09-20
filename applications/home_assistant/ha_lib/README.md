@@ -1,15 +1,16 @@
 # ha_lib — Home Assistant 共享库
 
-设备无关的 TCP JSON 服务器库，供所有 HA 固件项目（light/switch/radar_rd_01/433_gateway/key_sensor/usb_sw）复用。
+设备无关的 TCP JSON 服务器库，供所有 HA 固件项目（light/switch/radar_rd_01/433_gateway/usb_sw/tts）复用。
 
 ## 文件说明
 
 | 文件 | 说明 |
 |------|------|
-| `ha_device.h` | 设备抽象结构体 `ha_device_t`，定义设备类型/名称/型号/版本/端口/回调 |
+| `ha_device.h` | 设备抽象结构体 `ha_device_t`，定义设备类型/名称/型号/厂商/版本/端口/回调 |
 | `ha_json.c/h` | 基于 cJSON 的 JSON 字段解析器（`ha_json_str`/`ha_json_int`） |
 | `tcp_json_server.c` | TCP 服务主逻辑：监听端口、响应 `get_device`/`get_state`、分发 `set` |
-| `ha_push.c/h` | 推送模块（NVS 配置目标 IP/端口 + TCP 推送） |
+| `ha_push.c/h` | 推送模块（NVS 配置目标主机/端口 + TCP 推送） |
+| `ha_mdns_query.c/h` | 域名解析（.local 走 mDNS 组播查询，其余走 DNS，带 4 条缓存） |
 | `bouffalo.mk` | BL602 SDK 组件构建脚本 |
 
 ## API
@@ -18,10 +19,11 @@
 
 ```c
 typedef struct {
-    const char *type;                     // 设备类型，如 "light"/"switch"/"radar"/"event"
+    const char *type;                     // 设备类型，如 "light"/"switch"/"radar"/"event"/"tts"
     const char *name;                     // 设备名称，如 "彩灯"/"智能开关"/"433网关"
     const char *model;                    // 设备型号，如 "Ai-WB2-12F"/"RD-01"
-    const char *sw_version;               // 固件版本，如 "1.0.0"
+    const char *manufacturer;             // 厂商，如 "AND-DIY"
+    const char *sw_version;               // 固件版本，如 "1.0.1"
     int port;                             // TCP 监听端口，默认 9100
     int (*get_device)(char *buf, int buf_len);  // 填充实体定义（不含花括号）
     int (*get_state)(char *buf, int buf_len);   // 填充实体状态（不含花括号）
@@ -58,15 +60,19 @@ int ha_json_int(const char *buf, const char *key, int def);
 ### ha_push 模块
 
 ```c
-void ha_push_init(void);                              // 从 NVS 加载配置
-void ha_push_set_target(const char *ip, uint16_t port); // 设置目标并保存到 NVS
-void ha_push_send(const char *json);                  // 发送 JSON 到 HA（非阻塞）
-uint8_t ha_push_enabled(void);                        // 是否已配置目标
+void ha_push_init(void);                                    // 从 NVS 加载配置
+void ha_push_set_target(const char *host, uint16_t port);   // 设置目标主机/IP 并保存到 NVS
+void ha_push_clear(void);                                   // 清除推送配置并禁用推送
+void ha_push_send(const char *json);                        // 发送 JSON 到 HA（阻塞，同步 TCP 连接）
+uint8_t ha_push_enabled(void);                              // 是否已配置目标
 ```
+
+`ha_push_set_target` 的 `host` 参数支持 IP 地址（如 `"192.168.1.100"`）和域名（如 `"homeassistant.local"`），
+域名通过 `ha_mdns_query` 模块自动解析（.local 走 mDNS，其余走 DNS）。
 
 ## 新设备接入步骤
 
-1. 在 `app_config.h` 中定义 `DEVICE_TYPE`/`DEVICE_NAME`/`DEVICE_MODEL`/`DEVICE_SW_VERSION`/`TCP_SERVER_PORT`
+1. 在 `app_config.h` 中定义 `DEVICE_TYPE`/`DEVICE_NAME`/`DEVICE_MODEL`/`DEVICE_MANUFACTURER`/`DEVICE_SW_VERSION`/`TCP_SERVER_PORT`
 2. 实现 `xxx_handler_get_device()`、`xxx_handler_get_state()` 和 `xxx_handler_set_state()` 函数
 3. 在 `main.c` 中注册 `ha_device_t` 并启动服务器：
 
@@ -75,6 +81,7 @@ static const ha_device_t ha_dev = {
     .type = DEVICE_TYPE,
     .name = DEVICE_NAME,
     .model = DEVICE_MODEL,
+    .manufacturer = DEVICE_MANUFACTURER,
     .sw_version = DEVICE_SW_VERSION,
     .port = TCP_SERVER_PORT,
     .get_device = xxx_handler_get_device,
@@ -92,7 +99,7 @@ xTaskCreate(ha_tcp_server_start, "tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 
 
 ```
 请求: {"cmd":"get_device"}
-响应: {"mac":"XX:XX:XX:XX:XX:XX","name":"...","model":"...","sw_version":"...",
+响应: {"mac":"XX:XX:XX:XX:XX:XX","name":"...","model":"...","manufacturer":"...","sw_version":"...",
        "entities":[{"id":"...","type":"...","name":"...","icon":"..."}]}
 ```
 
@@ -120,3 +127,5 @@ xTaskCreate(ha_tcp_server_start, "tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 
 | `button` | action | — | 按钮 |
 | `event` | — | 有 | 事件 |
 | `sensor` | — | 有 | 数据传感器 |
+| `notify` | set（text） | — | 通知（TTS 语音合成） |
+| `number` | set（value） | 有 | 数值（TTS 音量/语速） |

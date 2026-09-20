@@ -4,7 +4,7 @@
 固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
 通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
-**当前版本: 1.0.0**
+**当前版本: 1.0.1**
 
 ## 硬件连接
 
@@ -37,13 +37,11 @@
 
 | 文件 | 说明 |
 |------|------|
-| `main.c` | 应用入口,WiFi 事件处理,`ha_device_t` 注册,雷达数据回调 |
+| `main.c` | 应用入口，WiFi 事件处理，`ha_device_t` 注册，雷达数据回调 |
 | `radar_handler.c/h` | 设备回调：`get_device` 返回实体定义，`get_state` 返回运动/存在状态 |
-| `store.c/h` | WiFi 凭据 + 推送配置持久化(EasyFlash) |
-| `wifi_sta.c/h` | WiFi STA 连接管理 |
-| `blufi_app.c/h` | BLE BluFi 配网模块(支持自定义数据接收 HA IP) |
-| `app_config.h` | 设备配置(引脚/端口/名称/调试开关) |
-| `D103/` | RD-01 模组内雷达芯片驱动库(原始,未修改) |
+| `app_config.h` | 设备配置（引脚/端口/名称/调试开关） |
+| `bouffalo.mk` | BL602 SDK 组件构建脚本 |
+| `D103/` | RD-01 模组内雷达芯片驱动库（原始，未修改） |
 | `bodysense_lib/` | 人体感应算法库 |
 | `axk_factory/` | 出厂测试库 |
 | `hal_wifi/` | WiFi HAL 层 |
@@ -61,12 +59,12 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"1.0.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","manufacturer":"AND-DIY","sw_version":"1.0.1",
  "entities":[
-   {"id":"ACD8297A605D_001","type":"binary_sensor","name":"运动检测","icon":"mdi:motion-sensor"},
-   {"id":"ACD8297A605D_002","type":"binary_sensor","name":"存在检测","icon":"mdi:human-greeting"},
-   {"id":"ACD8297A605D_003","type":"button","name":"校准","icon":"mdi:target","action":"calibrate"},
-   {"id":"ACD8297A605D_004","type":"button","name":"恢复默认","icon":"mdi:restore","action":"restore"}
+   {"id":"ACD8297A605D_001","type":"binary_sensor","name":"有人","icon":"mdi:motion-sensor"},
+   {"id":"ACD8297A605D_002","type":"binary_sensor","name":"运动","icon":"mdi:run-fast"},
+   {"id":"ACD8297A605D_003","type":"button","name":"标定无人","icon":"mdi:cog-counterclockwise","action":"calibrate"},
+   {"id":"ACD8297A605D_004","type":"button","name":"恢复默认参数","icon":"mdi:restore","action":"restore"}
  ]}
 ```
 
@@ -89,7 +87,7 @@
 ```json
 {"cmd":"calibrate"}       // 标定无人（校准阈值）
 {"cmd":"restore"}         // 恢复默认参数
-{"cmd":"push_cfg","ip":"192.168.1.100","port":9101}  // 配置推送目标
+{"cmd":"push_cfg","host":"192.168.1.100","port":9101}  // 配置推送目标（支持 IP 和域名）
 ```
 
 ### 推送
@@ -112,8 +110,11 @@
 | 2 | STATICMotion(静止) | 0 | 1 |
 | 3 | BOTH_STATUS(运动+静止) | 1 | 1 |
 
-- **motion**: 仅在检测到运动时为 1(BODYMOTION 或 BOTH_STATUS)
-- **presence**: 任何检测结果均视为存在(原始值 1/2/3)
+- **有人（presence）**: 任何检测结果均视为存在（原始值 1/2/3），直接使用原始值
+- **运动（motion）**: 带防抖逻辑 — 当雷达报告静止(原始值=2)时，需连续检测 `STATIONARY_CONFIRM_COUNT`（默认10次）才判定为无运动；在此之前仍保持 `motion=1`
+
+防抖机制：每次雷达报告运动状态时调用 `radar_handler_set_motion()`，若原始值为2则递增静止计数器，
+达到阈值后 `radar_handler_get_motion()` 才返回0；任何非静止状态会重置计数器。
 
 ### 调试模式
 
@@ -154,17 +155,22 @@ make -j6
 ```c
 // RD-01 模组硬件(内部接口)
 #define RADAR_CS_PIN          22      // SPI 片选(连接模组内雷达芯片)
-#define RADAR_POWER_PIN       25      // 电源控制(实际使用 20,控制模组内雷达芯片)
+#define RADAR_POWER_PIN       25      // 电源控制(控制模组内雷达芯片)
 
 // 设备身份
 #define TCP_SERVER_PORT       9100
+#define TCP_SERVER_STACK      4096
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "1.0.0"
+#define DEVICE_MANUFACTURER   "AND-DIY"
+#define DEVICE_SW_VERSION     "1.0.1"
 
 // 推送配置
 #define HA_PUSH_DEFAULT_PORT  9101    // HA 推送监听端口
+
+// 静止判定防抖：连续检测到几次无运动才判定为静止
+#define STATIONARY_CONFIRM_COUNT   10
 
 // 调试开关
 #define RADAR_GATE_DATA_ENABLE    0   // 门数据上报(0=关闭)

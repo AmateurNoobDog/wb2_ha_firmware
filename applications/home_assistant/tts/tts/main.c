@@ -6,14 +6,15 @@
 #include "blog.h"
 
 #include <lwip/tcpip.h>
-#include "led.h"
+#include "uart_app.h"
+#include "tw_tts_app.h"
 #include "store.h"
 #include "wifi_sta.h"
 #include "blufi_app.h"
 #include "ha_device.h"
 #include "ha_push.h"
 #include "ha_mdns.h"
-#include "led_handler.h"
+#include "tts_handler.h"
 #include "app_config.h"
 
 static const ha_device_t ha_dev = {
@@ -23,9 +24,9 @@ static const ha_device_t ha_dev = {
     .manufacturer = DEVICE_MANUFACTURER,
     .sw_version = DEVICE_SW_VERSION,
     .port = TCP_SERVER_PORT,
-    .get_device = led_handler_get_device,
-    .get_state = led_handler_get_state,
-    .set_state = led_handler_set_state,
+    .get_device = tts_handler_get_device,
+    .get_state = tts_handler_get_state,
+    .set_state = tts_handler_set_state,
 };
 
 static void on_got_ip(void)
@@ -77,9 +78,14 @@ static void boot_mode(void)
 
 void main(void)
 {
-    led_init();
-    puts("[OS] light starting...");
+    uart_init();
+    uart_log("[TTS] uart initialized\r\n");
+    uart_log("[TTS] starting Ai-WB2 TTS firmware\r\n");
+    tts_handler_init();
+    uart_log("[TTS] tts_handler initialized\r\n");
     tcpip_init(NULL, NULL);
+    uart_log("[TTS] tcpip initialized\r\n");
     boot_mode();
-    puts("[OS] main exit");
+    uart_log("[TTS] boot_mode done, entering main loop\r\n");
+    while (1) vTaskDelay(1000);
 }

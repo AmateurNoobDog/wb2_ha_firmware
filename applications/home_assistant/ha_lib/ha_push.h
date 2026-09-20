@@ -7,8 +7,8 @@
  * Call this after WiFi got IP. */
 void ha_push_init(void);
 
-/* Set HA target IP and port, save to NVS. */
-void ha_push_set_target(const char *ip, uint16_t port);
+/* Set HA target (IP or hostname) and port, save to NVS. */
+void ha_push_set_target(const char *host, uint16_t port);
 
 /* Clear push config and disable push. */
 void ha_push_clear(void);

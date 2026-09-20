@@ -16,9 +16,10 @@
 
 /* Device information */
 #define DEVICE_TYPE          "event"
-#define DEVICE_NAME          "433\xE7\xBD\x91\xE5\x85\xB3"
+#define DEVICE_NAME          "433网关"
 #define DEVICE_MODEL         "Ai-WB2-12F"
-#define DEVICE_SW_VERSION    "1.0.0"
+#define DEVICE_MANUFACTURER  "AND-DIY"
+#define DEVICE_SW_VERSION    "1.0.1"
 
 /* Store keys */
 #define STORE_KEY_SSID       "ROUTER_SSID"
@@ -35,5 +36,10 @@
 #define STORE_KEY_HA_IP       "HA_IP"
 #define STORE_KEY_HA_PORT     "HA_PORT"
 #define STORE_IP_MAX          16
+
+#define STORE_KEY_VOLUME      "TTS_VOLUME"
+#define STORE_KEY_SPEED       "TTS_SPEED"
+#define TTS_DEFAULT_VOLUME    5
+#define TTS_DEFAULT_SPEED     5
 
 #endif /* __APP_CONFIG_H__ */

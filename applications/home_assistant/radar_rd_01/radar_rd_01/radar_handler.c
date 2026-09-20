@@ -160,10 +160,11 @@ int radar_handler_set_state(const char *cmd_json)
         return radar_handler_restore_defaults();
     }
     if (strcmp(cmd, "push_cfg") == 0) {
-        const char *ip = ha_json_str(cmd_json, "ip");
+        const char *host = ha_json_str(cmd_json, "host");
+        if (!host) host = ha_json_str(cmd_json, "ip");
         int port = ha_json_int(cmd_json, "port", HA_PUSH_DEFAULT_PORT);
-        if (ip) {
-            ha_push_set_target(ip, (uint16_t)port);
+        if (host) {
+            ha_push_set_target(host, (uint16_t)port);
         }
         return 0;
     }

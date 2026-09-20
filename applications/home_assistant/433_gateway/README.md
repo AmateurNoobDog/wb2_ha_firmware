@@ -2,7 +2,7 @@
 
 433MHz 遥控接收器网关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制 + Push 推送。
 
-**当前版本: 1.0.0**
+**当前版本: 1.0.1**
 
 ## 硬件连接
 
@@ -17,10 +17,8 @@
 | `main.c` | 应用入口，WiFi 事件处理，`ha_device_t` 注册 |
 | `event_handler.c/h` | 设备回调：`get_device` 返回实体定义，`get_state` 返回事件状态，push 上报按键事件 |
 | `uart_433.c/h` | UART 433 接收驱动 |
-| `store.c/h` | WiFi 凭据 + 推送配置持久化（EasyFlash） |
-| `wifi_sta.c/h` | WiFi STA 连接管理 |
-| `blufi_app.h/c` | BLE BluFi 配网模块 |
 | `app_config.h` | 设备配置（引脚/端口/名称） |
+| `bouffalo.mk` | BL602 SDK 组件构建脚本 |
 
 ## TCP 协议（v2）
 
@@ -34,7 +32,7 @@
 
 响应：
 ```json
-{"mac":"7C:B9:4C:D1:F7:67","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.0.0",
+{"mac":"7C:B9:4C:D1:F7:67","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.0.1",
  "entities":[
    {"id":"7CB94CD1F767_001","type":"button","name":"配对","icon":"mdi:remote","action":"pair"},
    {"id":"7CB94CD1F767_002","type":"button","name":"重置","icon":"mdi:restore","action":"reset"},
@@ -94,7 +92,7 @@ make -j4
 #define DEVICE_TYPE        "event"
 #define DEVICE_NAME        "433网关"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "1.0.0"
+#define DEVICE_SW_VERSION  "1.0.1"
 #define HA_PUSH_DEFAULT_PORT  9101
 ```
 

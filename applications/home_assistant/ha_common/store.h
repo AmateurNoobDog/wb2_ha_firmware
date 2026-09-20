@@ -10,9 +10,9 @@ typedef struct {
 } store_wifi_t;
 
 typedef struct {
-    char ip[16];
+    char host[64];       // HA host: IP address or hostname (e.g. homeassistant.local)
     uint16_t port;
-    uint8_t enabled;     // 1 if HA IP is configured
+    uint8_t enabled;     // 1 if HA target is configured
 } store_push_t;
 
 void store_init(void);
@@ -24,10 +24,13 @@ void store_wifi_save_pwd(const uint8_t *pwd, int len);
 void store_wifi_clear(void);
 
 bool store_push_load(store_push_t *cfg);
-void store_push_save(const char *ip, uint16_t port);
+void store_push_save(const char *host, uint16_t port);
 void store_push_clear(void);
 
 bool store_reboot_provision_check(int threshold);
 void store_reboot_provision_clear(void);
+
+bool store_tts_load(uint8_t *volume, uint8_t *speed);
+void store_tts_save(uint8_t volume, uint8_t speed);
 
 #endif /* __STORE_H__ */

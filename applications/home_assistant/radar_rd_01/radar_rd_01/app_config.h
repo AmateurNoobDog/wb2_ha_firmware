@@ -13,7 +13,8 @@
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION     "1.0.0"
+#define DEVICE_MANUFACTURER   "AND-DIY"
+#define DEVICE_SW_VERSION     "1.0.1"
 
 // Reboot provisioning detection
 #define REBOOT_PROVISION_COUNT  3
@@ -30,6 +31,11 @@
 #define STORE_KEY_HA_IP       "HA_IP"
 #define STORE_KEY_HA_PORT     "HA_PORT"
 #define STORE_IP_MAX          16      // "255.255.255.255" + \0
+
+#define STORE_KEY_VOLUME      "TTS_VOLUME"
+#define STORE_KEY_SPEED       "TTS_SPEED"
+#define TTS_DEFAULT_VOLUME    5
+#define TTS_DEFAULT_SPEED     5
 
 // Radar data processing configuration
 #define FUNC_QUEUE_SIZE       34      // SPI data queue size

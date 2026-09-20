@@ -34,6 +34,7 @@ static const ha_device_t ha_dev = {
     .type = DEVICE_TYPE,
     .name = DEVICE_NAME,
     .model = DEVICE_MODEL,
+    .manufacturer = DEVICE_MANUFACTURER,
     .sw_version = DEVICE_SW_VERSION,
     .port = TCP_SERVER_PORT,
     .get_device = radar_handler_get_device,

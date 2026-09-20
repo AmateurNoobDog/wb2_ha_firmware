@@ -44,9 +44,12 @@ static void respond_device(struct netconn *conn)
     }
     n = snprintf(line, sizeof(line),
                  "{\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
-                 "\"name\":\"%s\",\"model\":\"%s\",\"sw_version\":\"%s\",%s}",
+                 "\"name\":\"%s\",\"model\":\"%s\",\"manufacturer\":\"%s\","
+                 "\"sw_version\":\"%s\",%s}",
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
-                 s_dev->name, s_dev->model, s_dev->sw_version, dev);
+                 s_dev->name, s_dev->model,
+                 s_dev->manufacturer ? s_dev->manufacturer : "",
+                 s_dev->sw_version, dev);
     netconn_write(conn, line, n, NETCONN_NOCOPY);
     netconn_write(conn, "\r\n", 2, NETCONN_NOCOPY);
     tcp_log("[TCP] send get_device: %s", line);

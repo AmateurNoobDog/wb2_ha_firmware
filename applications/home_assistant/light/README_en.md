@@ -1,5 +1,7 @@
 # light — RGB LED Firmware
 
+> **English** | [中文](README.md)
+
 RGB LED firmware based on Ai-WB2 (BL602), with WiFi + BLE BluFi provisioning + TCP JSON control.
 
 **Current Version: 1.0.1**

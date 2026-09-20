@@ -1,5 +1,7 @@
 # ha_common — Shared Components
 
+> **English** | [中文](README.md)
+
 Shared infrastructure used by all HA firmware projects (light/switch/radar_rd_01/433_gateway/usb_sw/tts), avoiding code duplication.
 
 ## File Description

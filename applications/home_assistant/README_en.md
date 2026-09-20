@@ -1,5 +1,7 @@
 # Ai-Thinker WB2 Home Assistant Firmware Collection
 
+> **English** | [中文](README.md)
+
 Smart home application firmware based on the [Ai-Thinker-WB2 (BL602)](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2) SDK.
 Devices connect to the local network via WiFi and integrate with Home Assistant using a lightweight TCP JSON protocol
 (see [`and_home`](https://gitee.com/AmateurNoobDog/and_home) for the companion integration).

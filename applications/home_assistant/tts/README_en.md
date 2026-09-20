@@ -1,5 +1,7 @@
 # tts — TTS Speech Synthesis Firmware
 
+> **English** | [中文](README.md)
+
 TTS speech synthesis firmware based on Ai-WB2 (BL602) + TW-TTS module, with WiFi + BLE BluFi provisioning + TCP JSON control.
 
 **Current Version: 1.0.1**

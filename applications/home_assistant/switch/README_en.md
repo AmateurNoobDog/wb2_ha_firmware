@@ -1,5 +1,7 @@
 # switch — 3-Channel Smart Switch Firmware
 
+> **English** | [中文](README.md)
+
 3-channel relay switch firmware based on Ai-WB2 (BL602), with WiFi + BLE BluFi provisioning + TCP JSON control.
 
 **Current Version: 1.0.1**

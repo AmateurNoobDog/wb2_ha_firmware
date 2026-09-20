@@ -1,5 +1,7 @@
 # radar_rd_01 — Radar Presence Detection Firmware
 
+> **English** | [中文](README.md)
+
 Human presence detection firmware based on Ai-Thinker RD-01 module (BL602 + radar chip integrated).
 The firmware runs on the BL602 inside the module, communicating with the radar chip via SPI/I2C/UART,
 and reports motion/presence status to Home Assistant via WiFi + TCP JSON.

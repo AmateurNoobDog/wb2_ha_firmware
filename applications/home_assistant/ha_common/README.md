@@ -1,5 +1,7 @@
 # ha_common — 共享模块
 
+> [English](README_en.md) | **中文**
+
 各 HA 固件项目(light/switch/radar_rd_01/433_gateway/usb_sw/tts)共用的基础设施,避免代码重复。
 
 ## 文件说明

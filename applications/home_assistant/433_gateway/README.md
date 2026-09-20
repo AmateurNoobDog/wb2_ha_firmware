@@ -1,5 +1,7 @@
 # 433_gateway — 433 遥控网关固件
 
+> [English](README_en.md) | **中文**
+
 433MHz 遥控接收器网关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制 + Push 推送。
 
 **当前版本: 1.0.1**

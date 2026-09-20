@@ -1,5 +1,7 @@
 # 433_gateway — 433MHz Remote Control Gateway Firmware
 
+> **English** | [中文](README.md)
+
 433MHz remote receiver gateway firmware with WiFi + BLE BluFi provisioning + TCP JSON control + Push reporting.
 
 **Current Version: 1.0.1**

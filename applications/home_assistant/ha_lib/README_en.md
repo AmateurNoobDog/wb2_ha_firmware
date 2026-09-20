@@ -1,5 +1,7 @@
 # ha_lib — Home Assistant Shared Library
 
+> **English** | [中文](README.md)
+
 Device-agnostic TCP JSON server library, reused by all HA firmware projects (light/switch/radar_rd_01/433_gateway/usb_sw/tts).
 
 ## File Description

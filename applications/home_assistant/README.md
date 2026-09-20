@@ -1,5 +1,7 @@
 # Ai-Thinker WB2 Home Assistant 固件项目集
 
+> [English](README_en.md) | **中文**
+
 基于 [Ai-Thinker-WB2 (BL602)](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2) SDK 的智能家居应用固件。
 设备通过 WiFi 接入局域网，使用轻量 TCP JSON 协议与 Home Assistant 集成
 （配套集成见 [`and_home`](https://gitee.com/AmateurNoobDog/and_home)）。

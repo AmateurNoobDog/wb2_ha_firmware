@@ -42,15 +42,22 @@ static int dht20_read_raw(uint8_t *buf, uint8_t len)
 
     vTaskDelay(pdMS_TO_TICKS(80));
 
+    int ready = 0;
     for (int retry = 0; retry < 50; retry++) {
         uint8_t status;
         if (hosal_i2c_master_recv(&s_i2c, DHT20_I2C_ADDR, &status, 1, DHT20_TIMEOUT_MS) != 0) {
             return -1;
         }
         if (!(status & 0x80)) {
+            ready = 1;
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(5));
+    }
+
+    if (!ready) {
+        blog_error("[DHT20] sensor busy timeout after polling");
+        return -1;
     }
 
     if (hosal_i2c_master_recv(&s_i2c, DHT20_I2C_ADDR, buf, len, DHT20_TIMEOUT_MS) != 0) {
@@ -84,28 +91,50 @@ int DHT20_Read(float *temperature, float *humidity)
 {
     uint8_t buf[DHT20_DATA_LEN];
 
-    if (dht20_read_raw(buf, DHT20_DATA_LEN) != 0) {
-        return -1;
+    for (int attempt = 0; attempt < 3; attempt++) {
+        if (dht20_read_raw(buf, DHT20_DATA_LEN) != 0) {
+            blog_warn("[DHT20] raw read failed, attempt %d", attempt + 1);
+            vTaskDelay(pdMS_TO_TICKS(20));
+            continue;
+        }
+
+        if (dht20_crc8(buf, 6) != buf[6]) {
+            blog_warn("[DHT20] crc error attempt %d: calc=0x%02X recv=0x%02X",
+                      attempt + 1, dht20_crc8(buf, 6), buf[6]);
+            vTaskDelay(pdMS_TO_TICKS(20));
+            continue;
+        }
+
+        uint32_t raw_hum = buf[1];
+        raw_hum <<= 8;
+        raw_hum += buf[2];
+        raw_hum <<= 4;
+        raw_hum += (buf[3] >> 4);
+        *humidity = raw_hum * 9.5367431640625e-5f;
+
+        uint32_t raw_temp = (buf[3] & 0x0F);
+        raw_temp <<= 8;
+        raw_temp += buf[4];
+        raw_temp <<= 8;
+        raw_temp += buf[5];
+        *temperature = raw_temp * 1.9073486328125e-4f - 50.0f;
+
+        if (*humidity > 100.0f || *temperature < -40.0f || *temperature > 80.0f) {
+            blog_error("[DHT20] invalid data: temp=%.1f hum=%.1f raw=0x%05X",
+                       *temperature, *humidity, raw_hum);
+            vTaskDelay(pdMS_TO_TICKS(20));
+            continue;
+        }
+
+        if (raw_hum == 0 && raw_temp == 0) {
+            blog_error("[DHT20] zero raw data detected, sensor may be unresponsive");
+            vTaskDelay(pdMS_TO_TICKS(20));
+            continue;
+        }
+
+        return 0;
     }
 
-    if (dht20_crc8(buf, 6) != buf[6]) {
-        blog_error("[DHT20] crc error: calc=0x%02X recv=0x%02X", dht20_crc8(buf, 6), buf[6]);
-        return -1;
-    }
-
-    uint32_t raw_hum = buf[1];
-    raw_hum <<= 8;
-    raw_hum += buf[2];
-    raw_hum <<= 4;
-    raw_hum += (buf[3] >> 4);
-    *humidity = raw_hum * 9.5367431640625e-5f;
-
-    uint32_t raw_temp = (buf[3] & 0x0F);
-    raw_temp <<= 8;
-    raw_temp += buf[4];
-    raw_temp <<= 8;
-    raw_temp += buf[5];
-    *temperature = raw_temp * 1.9073486328125e-4f - 50.0f;
-
-    return 0;
+    blog_error("[DHT20] all 3 read attempts failed");
+    return -1;
 }

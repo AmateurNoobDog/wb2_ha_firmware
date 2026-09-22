@@ -19,7 +19,8 @@ applications/home_assistant/
 ├── switch/         # 3 路智能开关固件（GPIO 继电器，设备类型 switch）
 ├── usb_sw/         # 单路 USB 通断器固件（IO4 低电平开启，设备类型 switch）
 ├── 433_gateway/    # 433 遥控网关固件（UART1 接收，设备类型 event）
-└── tts/            # TTS 语音合成固件（TW-TTS 模块，设备类型 tts）
+├── tts/            # TTS 语音合成固件（TW-TTS 模块，设备类型 tts）
+└── dht20_ha/       # DHT20 温湿度传感器固件（I2C，设备类型 sensor）
 ```
 
 ### ha_lib（共享组件）
@@ -173,7 +174,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 | `binary_sensor` | — | 有 | 二进制传感器（雷达 motion/presence） |
 | `button` | action cmd | — | 按钮（配对/重置） |
 | `event` | — | 有 | 事件（433 按键按下/释放） |
-| `sensor` | — | 有 | 数据传感器（键值） |
+| `sensor` | — | 有 | 数据传感器（键值 / 温湿度） |
 | `notify` | set（text） | — | 通知（TTS 语音合成） |
 | `number` | set（value） | 有 | 数值（TTS 音量/语速） |
 

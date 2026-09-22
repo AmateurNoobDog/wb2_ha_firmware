@@ -19,7 +19,8 @@ applications/home_assistant/
 ├── switch/         # 3-channel smart switch firmware (GPIO relay, device type: switch)
 ├── usb_sw/         # Single USB switch firmware (IO4 active-low, device type: switch)
 ├── 433_gateway/    # 433MHz remote control gateway firmware (UART1 receiver, device type: event)
-└── tts/            # TTS speech synthesis firmware (TW-TTS module, device type: tts)
+├── tts/            # TTS speech synthesis firmware (TW-TTS module, device type: tts)
+└── dht20_ha/       # DHT20 temperature/humidity sensor firmware (I2C, device type: sensor)
 ```
 
 ### ha_lib (Shared Component)
@@ -173,7 +174,7 @@ Multi entity format (switch):
 | `binary_sensor` | — | Yes | Binary sensor (radar motion/presence) |
 | `button` | action cmd | — | Button (pair/reset) |
 | `event` | — | Yes | Event (433 key press/release) |
-| `sensor` | — | Yes | Data sensor (key value) |
+| `sensor` | — | Yes | Data sensor (key value / temperature & humidity) |
 | `notify` | set (text) | — | Notification (TTS speech synthesis) |
 | `number` | set (value) | Yes | Numeric (TTS volume/speed) |
 

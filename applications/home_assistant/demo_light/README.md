@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # demo_light — RGB 彩灯固件
 
 基于 Ai-WB2（BL602）的 RGB 彩灯固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。

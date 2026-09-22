@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # example_binary_sensor_radar — 雷达存在检测固件
 
 基于 Ai-Thinker RD-01 模组(BL602 + 雷达芯片一体)的人体存在检测固件。

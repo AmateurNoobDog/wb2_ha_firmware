@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # demo_sensor_dht20 — DHT20 温湿度传感器固件
 
 基于 Ai-WB2（BL602）+ DHT20 温湿度传感器的固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 上报。

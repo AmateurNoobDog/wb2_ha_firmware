@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # example_event_gateway_433 — 433 遥控网关固件
 
 433MHz 遥控接收器网关固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制 + Push 推送。

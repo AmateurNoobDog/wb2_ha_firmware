@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # example_notify_tts — 语音合成固件
 
 基于 Ai-WB2（BL602）+ 外部 TTS 语音合成模块的固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。

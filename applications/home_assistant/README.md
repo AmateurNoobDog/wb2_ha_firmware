@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # Ai-Thinker WB2 Home Assistant 固件项目集
 
 基于 [Ai-Thinker-WB2 (BL602)](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2) SDK 的智能家居应用固件。

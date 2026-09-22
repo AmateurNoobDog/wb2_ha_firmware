@@ -1,3 +1,5 @@
+[English](README_EN.md) | 中文
+
 # ha_lib — Home Assistant 共享库
 
 设备无关的 TCP JSON 服务器库，供所有 HA 固件项目（light/switch/radar_rd_01/433_gateway/key_sensor/usb_sw）复用。

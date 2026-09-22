@@ -6,28 +6,28 @@ Smart home application firmware based on the [Ai-Thinker-WB2 (BL602)](https://gi
 Devices connect to the local network via WiFi and integrate with Home Assistant using a lightweight TCP JSON protocol
 (see [`and_home`](https://gitee.com/AmateurNoobDog/and_home) for the companion integration).
 
-**Current Version: 1.0.1**
+**Current Version: 1.1.0**
 
 ## Project Structure
 
 ```
 applications/home_assistant/
-├── ha_lib/         # Shared library: device-agnostic TCP JSON server + cJSON parser + push module + hostname resolution
-├── ha_common/      # Shared components: store(wifi/easyflash), wifi_sta, blufi_app(BLE provisioning), ha_mdns
-├── light/          # RGB LED firmware (3-channel PWM, device type: light)
-├── radar_rd_01/    # Radar presence detection firmware (RD-01 chip, device type: radar)
-├── switch/         # 3-channel smart switch firmware (GPIO relay, device type: switch)
-├── usb_sw/         # Single USB switch firmware (IO4 active-low, device type: switch)
-├── 433_gateway/    # 433MHz remote control gateway firmware (UART1 receiver, device type: event)
-└── tts/            # TTS speech synthesis firmware (TW-TTS module, device type: tts)
+├── ha_lib/                       # Shared library: device-agnostic TCP JSON server + cJSON parser + push module
+├── ha_common/                    # Shared components: store(wifi/easyflash), wifi_sta, blufi_app(BLE provisioning), ha_mdns
+├── demo_switch/                  # [Dev Board] 3-channel smart switch (Ai-WB2-12F-Kit, GPIO relay)
+├── demo_light/                   # [Dev Board] RGB LED (Ai-WB2-12F-Kit, 3-channel PWM)
+├── demo_sensor_dht20/            # [Dev Board] Temperature/humidity sensor (Ai-WB2-12F-Kit + DHT20, I2C)
+├── example_usb_switch/           # [Module] Single USB switch (Ai-WB2-01S, IO4 active-low)
+├── example_event_gateway_433/    # [Module] 433MHz remote control gateway (Ai-WB2-12F + R1A, UART1 receiver)
+├── example_binary_sensor_radar/  # [Module] Radar presence detection (RD-01, SPI + UART)
+└── example_notify_tts/           # [Module] TTS speech synthesis (Ai-WB2-12F + TW-TTS, UART)
 ```
 
 ### ha_lib (Shared Component)
-- `ha_device.h`  — Device abstraction: type, name, model, manufacturer, version, port, `get_device`/`get_state`/`set_state` callbacks
+- `ha_device.h`  — Device abstraction: type, name, model, version, port, `get_device`/`get_state`/`set_state` callbacks
 - `ha_json.c/h`  — cJSON-based JSON field parser (`ha_json_str`/`ha_json_int`)
 - `tcp_json_server.c` — Generic TCP server: responds to `get_device`/`get_state`/`set` commands
-- `ha_push.c/h`  — Push module (TCP push to HA-configured host/port, supports IP and hostname)
-- `ha_mdns_query.c/h` — Hostname resolution (.local via mDNS, others via DNS, with cache)
+- `ha_push.c/h`  — Push module (TCP push to HA-configured host/port)
 
 New devices only need to implement their own handler and register a `ha_device_t` to reuse the server.
 
@@ -54,16 +54,21 @@ git clone https://gitee.com/AmateurNoobDog/wb2_ha_firmware.git home_assistant
 Requires a complete SDK environment (BL60X_SDK_PATH pointing to SDK root, with riscv toolchain):
 
 ```bash
-cd applications/home_assistant/switch   # or light, radar_rd_01, 433_gateway, usb_sw, tts
+cd applications/home_assistant/demo_switch   # or demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_notify_tts
 make -j4
-# Output: build_out/switch.bin
+# Output: build_out/demo_switch.bin
 ```
 
 ### 3. Flash
 
+Direct serial (using demo_switch as example):
+
 ```bash
-cd applications/home_assistant/switch   # or light, radar_rd_01, 433_gateway, usb_sw, tts
-make flash SERIAL_PORT=/dev/ttyUSB0
+cd <SDK>/tools/flash_tool
+./bflb_iot_tool-ubuntu --chipname=BL602 --baudrate=921600 --port=/dev/ttyUSB0 \
+  --pt=<project>/img_conf/partition_cfg_2M.toml \
+  --dts=<project>/img_conf/bl_factory_params_IoTKitA_40M.dts \
+  --firmware=<project>/build_out/demo_switch.bin
 ```
 
 ### 4. WiFi Provisioning
@@ -98,7 +103,7 @@ Requests/responses are single-line JSON, separated by `\n`.
 
 Response example (switch):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","manufacturer":"AND-DIY","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","sw_version":"1.0.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"Switch 1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"Switch 2","icon":"mdi:toggle-switch"},
@@ -108,7 +113,7 @@ Response example (switch):
 
 Response example (433 gateway):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","manufacturer":"AND-DIY","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.0.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"Pair","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"Reset","icon":"mdi:restore","action":"reset"},
@@ -173,9 +178,9 @@ Multi entity format (switch):
 | `binary_sensor` | — | Yes | Binary sensor (radar motion/presence) |
 | `button` | action cmd | — | Button (pair/reset) |
 | `event` | — | Yes | Event (433 key press/release) |
-| `sensor` | — | Yes | Data sensor (key value) |
-| `notify` | set (text) | — | Notification (TTS speech synthesis) |
-| `number` | set (value) | Yes | Numeric (TTS volume/speed) |
+| `sensor` | — | Yes | Data sensor (temperature/humidity, key value) |
+| `notify` | text cmd | — | TTS speech synthesis |
+| `number` | value cmd | Yes | Numeric (TTS volume/speed) |
 
 ### Entity ID Format
 
@@ -195,16 +200,18 @@ Home Assistant discovers devices on the local network via zeroconf.
 
 ## Configuration
 
-- **light**: Pin/channel config in `light/light/app_config.h` (`LED_*_PIN`)
-- **switch**: Relay pins, polarity, channel names in `switch/switch/app_config.h`
+- **demo_light**: Pin/channel config in `demo_light/demo_light/app_config.h` (`LED_*_PIN`)
+- **demo_switch**: Relay pins, polarity, channel names in `demo_switch/demo_switch/app_config.h`
   (`SWITCH_PINS`, `RELAY_ACTIVE_HIGH`, `SWITCH_NAMES`)
-- **usb_sw**: Single USB switch pin in `usb_sw/usb_sw/app_config.h`
+- **example_usb_switch**: Single USB switch pin in `example_usb_switch/example_usb_switch/app_config.h`
   (`SWITCH_PINS`=IO4, `RELAY_ACTIVE_HIGH`=0 active-low)
-- **433_gateway**: 433 receiver config in `433_gateway/433_gateway/app_config.h`
+- **example_event_gateway_433**: 433 receiver config in `example_event_gateway_433/example_event_gateway_433/app_config.h`
   (UART1: TX=GPIO6, RX=GPIO4, 9600bps; pair button: GPIO5)
-- **tts**: TTS config in `tts/tts/app_config.h`
-  (UART1: TX=GPIO4, RX=GPIO11, 9600bps connecting to TW-TTS module)
-- **radar_rd_01**: Radar config in `radar_rd_01/radar_rd_01/app_config.h`
+- **example_notify_tts**: TTS config in `example_notify_tts/example_notify_tts/app_config.h`
+  (UART1: TX=GPIO4, RX=GPIO11, 9600bps; volume/speed range 0-9)
+- **demo_sensor_dht20**: Temperature/humidity sensor config in `demo_sensor_dht20/demo_sensor_dht20/app_config.h`
+  (I2C: SCL=IO12, SDA=IO3, 100kHz; report interval 5s)
+- **example_binary_sensor_radar**: Radar config in `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`
   - Debug switches: `RADAR_GATE_DATA_ENABLE` (gate data) / `RADAR_DEBUG_COUNTER_ENABLE` (counter)
 
 ## Dependencies

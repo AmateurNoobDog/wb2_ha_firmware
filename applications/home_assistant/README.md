@@ -1,34 +1,31 @@
 # Ai-Thinker WB2 Home Assistant 固件项目集
 
-> [English](README_en.md) | **中文**
-
 基于 [Ai-Thinker-WB2 (BL602)](https://gitee.com/Ai-Thinker-Open/Ai-Thinker-WB2) SDK 的智能家居应用固件。
 设备通过 WiFi 接入局域网，使用轻量 TCP JSON 协议与 Home Assistant 集成
 （配套集成见 [`and_home`](https://gitee.com/AmateurNoobDog/and_home)）。
 
-**当前版本: 1.0.1**
+**当前版本: 1.1.0**
 
 ## 项目结构
 
 ```
 applications/home_assistant/
-├── ha_lib/         # 共享库：设备无关的 TCP JSON 服务器 + cJSON 解析器 + 推送模块 + 域名解析
-├── ha_common/      # 公共组件：store(wifi/easyflash)、wifi_sta、blufi_app(蓝牙配网)、ha_mdns
-├── light/          # RGB 彩灯固件（3 路 PWM，设备类型 light）
-├── radar_rd_01/    # 雷达存在检测固件（RD-01 芯片，设备类型 radar）
-├── switch/         # 3 路智能开关固件（GPIO 继电器，设备类型 switch）
-├── usb_sw/         # 单路 USB 通断器固件（IO4 低电平开启，设备类型 switch）
-├── 433_gateway/    # 433 遥控网关固件（UART1 接收，设备类型 event）
-├── tts/            # TTS 语音合成固件（TW-TTS 模块，设备类型 tts）
-└── dht20_ha/       # DHT20 温湿度传感器固件（I2C，设备类型 sensor）
+├── ha_lib/                       # 共享库：设备无关的 TCP JSON 服务器 + cJSON 解析器 + 推送模块
+├── ha_common/                    # 公共组件：store(wifi/easyflash)、wifi_sta、blufi_app(蓝牙配网)、ha_mdns
+├── demo_switch/                  # 【开发板】3 路智能开关（Ai-WB2-12F-Kit，GPIO 继电器）
+├── demo_light/                   # 【开发板】RGB 彩灯（Ai-WB2-12F-Kit，3 路 PWM）
+├── demo_sensor_dht20/            # 【开发板】温湿度传感器（Ai-WB2-12F-Kit + DHT20，I2C）
+├── example_usb_switch/           # 【模组】单路 USB 通断器（Ai-WB2-01S，IO4 低电平开启）
+├── example_event_gateway_433/    # 【模组】433 遥控网关（Ai-WB2-12F + R1A，UART1 接收）
+├── example_binary_sensor_radar/  # 【模组】雷达存在检测（RD-01，SPI + UART）
+└── example_notify_tts/           # 【模组】语音合成（Ai-WB2-12F + TW-TTS，UART）
 ```
 
 ### ha_lib（共享组件）
-- `ha_device.h`  — 设备抽象：类型、名称、型号、厂商、版本、端口、`get_device`/`get_state`/`set_state` 回调
+- `ha_device.h`  — 设备抽象：类型、名称、型号、版本、端口、`get_device`/`get_state`/`set_state` 回调
 - `ha_json.c/h`  — 基于 cJSON 的 JSON 字段解析（`ha_json_str`/`ha_json_int`）
 - `tcp_json_server.c` — 通用 TCP 服务：响应 `get_device`/`get_state`/`set` 命令
-- `ha_push.c/h`  — 推送模块（TCP 推送至 HA 配置的目标主机/端口，支持 IP 和域名）
-- `ha_mdns_query.c/h` — 域名解析（.local 走 mDNS，其余走 DNS，带缓存）
+- `ha_push.c/h`  — 推送模块（TCP 推送至 HA 配置的目标 IP/端口）
 
 新设备只需实现自己的 handler 并注册 `ha_device_t` 即可复用服务器。
 
@@ -55,16 +52,21 @@ git clone https://gitee.com/AmateurNoobDog/wb2_ha_firmware.git home_assistant
 需要完整 SDK 环境（BL60X_SDK_PATH 指向 SDK 根目录，含 riscv 工具链）：
 
 ```bash
-cd applications/home_assistant/switch   # 或 light, radar_rd_01, 433_gateway, usb_sw, tts
+cd applications/home_assistant/demo_switch   # 或 demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_notify_tts
 make -j4
-# 产物: build_out/switch.bin
+# 产物: build_out/demo_switch.bin
 ```
 
 ### 3. 烧录
 
+直接串口（以 demo_switch 为例）：
+
 ```bash
-cd applications/home_assistant/switch   # 或 light, radar_rd_01, 433_gateway, usb_sw, tts
-make flash SERIAL_PORT=/dev/ttyUSB0
+cd <SDK>/tools/flash_tool
+./bflb_iot_tool-ubuntu --chipname=BL602 --baudrate=921600 --port=/dev/ttyUSB0 \
+  --pt=<project>/img_conf/partition_cfg_2M.toml \
+  --dts=<project>/img_conf/bl_factory_params_IoTKitA_40M.dts \
+  --firmware=<project>/build_out/demo_switch.bin
 ```
 
 ### 4. 配网
@@ -99,7 +101,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（开关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","manufacturer":"AND-DIY","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.0.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"开关1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"开关2","icon":"mdi:toggle-switch"},
@@ -109,7 +111,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（433 网关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","manufacturer":"AND-DIY","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.0.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"配对","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"重置","icon":"mdi:restore","action":"reset"},
@@ -174,9 +176,9 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 | `binary_sensor` | — | 有 | 二进制传感器（雷达 motion/presence） |
 | `button` | action cmd | — | 按钮（配对/重置） |
 | `event` | — | 有 | 事件（433 按键按下/释放） |
-| `sensor` | — | 有 | 数据传感器（键值 / 温湿度） |
-| `notify` | set（text） | — | 通知（TTS 语音合成） |
-| `number` | set（value） | 有 | 数值（TTS 音量/语速） |
+| `sensor` | — | 有 | 数据传感器（温湿度、键值） |
+| `notify` | text cmd | — | TTS 语音合成 |
+| `number` | value cmd | 有 | 数值控制（音量/语速） |
 
 ### 实体 ID 格式
 
@@ -196,16 +198,18 @@ Home Assistant 通过 zeroconf 自动发现局域网内的设备。
 
 ## 配置
 
-- **light**: 引脚/通道见 `light/light/app_config.h`（`LED_*_PIN`）
-- **switch**: 继电器引脚、极性、通道名见 `switch/switch/app_config.h`
+- **demo_light**: 引脚/通道见 `demo_light/demo_light/app_config.h`（`LED_*_PIN`）
+- **demo_switch**: 继电器引脚、极性、通道名见 `demo_switch/demo_switch/app_config.h`
   （`SWITCH_PINS`、`RELAY_ACTIVE_HIGH`、`SWITCH_NAMES`）
-- **usb_sw**: 单路 USB 通断器引脚见 `usb_sw/usb_sw/app_config.h`
+- **example_usb_switch**: 单路 USB 通断器引脚见 `example_usb_switch/example_usb_switch/app_config.h`
   （`SWITCH_PINS`=IO4、`RELAY_ACTIVE_HIGH`=0 低电平开启）
-- **433_gateway**: 433 遥控接收器配置见 `433_gateway/433_gateway/app_config.h`
+- **example_event_gateway_433**: 433 遥控接收器配置见 `example_event_gateway_433/example_event_gateway_433/app_config.h`
   （UART1: TX=GPIO6, RX=GPIO4, 9600bps; 配对按钮: GPIO5）
-- **tts**: TTS 语音合成配置见 `tts/tts/app_config.h`
-  （UART1: TX=GPIO4, RX=GPIO11, 9600bps 连接 TW-TTS 模块）
-- **radar_rd_01**: 雷达配置见 `radar_rd_01/radar_rd_01/app_config.h`
+- **example_notify_tts**: 语音合成配置见 `example_notify_tts/example_notify_tts/app_config.h`
+  （UART1 TTS: TX=GPIO4, RX=GPIO11, 9600bps; 音量/语速范围 0-9）
+- **demo_sensor_dht20**: 温湿度传感器配置见 `demo_sensor_dht20/demo_sensor_dht20/app_config.h`
+  （I2C: SCL=IO12, SDA=IO3, 100kHz; 上报间隔 5s）
+- **example_binary_sensor_radar**: 雷达配置见 `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`
   - 调试开关：`RADAR_GATE_DATA_ENABLE`（门数据）/ `RADAR_DEBUG_COUNTER_ENABLE`（计数器）
 
 ## 依赖说明
@@ -216,5 +220,5 @@ Home Assistant 通过 zeroconf 自动发现局域网内的设备。
 
 ## 相关仓库
 
-- 固件仓库：[AmateurNoobDog/wb2_ha_firmware](https://gitee.com/AmateurNoobDog/wb2_ha_firmware)
+- 固件仓库：[amateur-dog/wb2_ha_firmware](https://gitee.com/amateur-dog/wb2_ha_firmware)
 - Home Assistant 集成：[AmateurNoobDog/and_home](https://gitee.com/AmateurNoobDog/and_home)

@@ -95,8 +95,13 @@ xTaskCreate(ha_tcp_server_start, "tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 
 ```
 请求: {"cmd":"get_device"}
 响应: {"mac":"XX:XX:XX:XX:XX:XX","name":"...","model":"...","sw_version":"...",
-       "entities":[{"id":"...","type":"...","name":"...","icon":"..."}]}
+       "entities":[{"id":"...","type":"...","name":"...","icon":"..."}],
+       "offline_timeout":300}
 ```
+
+可选字段 `offline_timeout`（秒）：设备上报的掉线超时，由各设备的 `get_device`
+回调自行填充（如温湿度传感器仅在推送已配置时上报 `300`）。HA 收到 `>0` 时进入
+推送-only 模式：不轮询，超过该时长无推送则实体不可用；`0`/缺省为轮询模式。
 
 ### get_state — 返回实体状态
 

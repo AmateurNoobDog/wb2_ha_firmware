@@ -20,6 +20,12 @@
 static float s_last_temperature = -999.0f;
 static float s_last_humidity = -999.0f;
 
+/* Cache maintained by sensor_task (sole I2C reader). get_state_impl only
+ * reads this cache to avoid concurrent I2C access with the sensor task. */
+static float s_cache_temperature = 0.0f;
+static float s_cache_humidity = 0.0f;
+static volatile int s_cache_valid = 0;
+
 static void gen_entity_id(char *buf, int buf_len, const uint8_t *mac, int seq)
 {
     snprintf(buf, buf_len, "%02X%02X%02X%02X%02X%02X_%03d",
@@ -58,9 +64,14 @@ static int get_device_impl(char *buf, int buf_len)
     gen_entity_id(id, sizeof(id), mac, 2);
     used += snprintf(buf + used, buf_len - used,
         "{\"id\":\"%s\",\"type\":\"sensor\",\"name\":\"湿度\",\"icon\":\"mdi:water-percent\","
-        "\"device_class\":\"humidity\",\"unit\":\"%%\"}"
-        "]",
+        "\"device_class\":\"humidity\",\"unit\":\"%%\"}]",
         id);
+
+    /* Report offline timeout only when push is configured, so HA enters
+     * push-only mode only for devices that will actually push. */
+    used += snprintf(buf + used, buf_len - used,
+        ",\"offline_timeout\":%d",
+        ha_push_enabled() ? DEVICE_OFFLINE_TIMEOUT : 0);
 
     return used;
 }
@@ -71,10 +82,12 @@ static int get_state_impl(char *buf, int buf_len)
     char id[20];
     float t, h;
 
-    if (DHT20_Read(&t, &h) != 0) {
-        blog_error("[SENSOR] read failed");
+    /* Serve from cache — sensor_task is the sole I2C reader. */
+    if (!s_cache_valid) {
         return snprintf(buf, buf_len, "\"entities\":[]");
     }
+    t = s_cache_temperature;
+    h = s_cache_humidity;
 
     if (wifi_mgmr_sta_mac_get(mac) != 0) {
         memset(mac, 0, sizeof(mac));
@@ -101,6 +114,7 @@ static void sensor_task(void *arg)
     (void)arg;
     float temperature, humidity;
     char push_json[256];
+    TickType_t last_push = xTaskGetTickCount();
 
     for (;;) {
         if (DHT20_Read(&temperature, &humidity) != 0) {
@@ -109,12 +123,24 @@ static void sensor_task(void *arg)
             continue;
         }
 
+        s_cache_temperature = temperature;
+        s_cache_humidity = humidity;
+        s_cache_valid = 1;
+
         blog_info("[SENSOR] temp=%.1fC hum=%.1f%%", temperature, humidity);
+
+        if (humidity < 0.1f) {
+            blog_warn("[SENSOR] humidity %.1f%% too low, skip push", humidity);
+            vTaskDelay(pdMS_TO_TICKS(SENSOR_READ_INTERVAL_MS));
+            continue;
+        }
 
         int temp_changed = (fabsf(temperature - s_last_temperature) >= 0.1f);
         int hum_changed = (fabsf(humidity - s_last_humidity) >= 0.1f);
+        int heartbeat = (xTaskGetTickCount() - last_push) >=
+                        pdMS_TO_TICKS(PUSH_HEARTBEAT_MS);
 
-        if (temp_changed || hum_changed) {
+        if (temp_changed || hum_changed || heartbeat) {
             uint8_t mac[6];
             char id_t[20], id_h[20];
             if (wifi_mgmr_sta_mac_get(mac) != 0) {
@@ -133,6 +159,7 @@ static void sensor_task(void *arg)
             ha_push_send(push_json);
             s_last_temperature = temperature;
             s_last_humidity = humidity;
+            last_push = xTaskGetTickCount();
         }
 
         vTaskDelay(pdMS_TO_TICKS(SENSOR_READ_INTERVAL_MS));

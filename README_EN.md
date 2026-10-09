@@ -20,6 +20,7 @@ applications/home_assistant/
 ├── example_usb_switch/           # [Module] Single-channel USB power switch (Ai-WB2-01S, IO4 active low)
 ├── example_event_gateway_433/    # [Module] 433MHz remote control gateway (Ai-WB2-12F + R1A, UART1 receiver)
 ├── example_binary_sensor_radar/  # [Module] Radar presence detection (RD-01, SPI + UART)
+├── example_radar_rd03d/          # [Module] Multi-target mmWave radar (Rd-03D_V2, UART1 256000bps)
 └── example_notify_tts/           # [Module] Text-to-speech (Ai-WB2-12F + TW-TTS, UART)
 ```
 
@@ -54,7 +55,7 @@ git clone https://gitee.com/AmateurNoobDog/wb2_ha_firmware.git home_assistant
 Requires complete SDK environment (BL60X_SDK_PATH pointing to SDK root directory, including riscv toolchain):
 
 ```bash
-cd applications/home_assistant/demo_switch   # or demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_notify_tts
+cd applications/home_assistant/demo_switch   # or demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_radar_rd03d, example_notify_tts
 make -j4
 # Output: build_out/demo_switch.bin
 ```
@@ -120,6 +121,11 @@ Response example (433 gateway):
    {"id":"ACD8297A605D_003","type":"event","name":"Key Value","icon":"mdi:remote"}
  ]}
 ```
+
+Optional field `offline_timeout` (seconds): the device-reported offline timeout.
+When `>0`, HA enters **push-only mode** (no polling) and marks entities unavailable if no
+push arrives within this timeout; `0`/absent keeps normal poll mode. Only devices with a
+configured push target report this field (e.g. the temp/humidity sensor reports `300`).
 
 ### Get Entity State
 
@@ -213,6 +219,10 @@ Home Assistant automatically discovers devices on the local network via zeroconf
   (I2C: SCL=IO12, SDA=IO3, 100kHz; report interval 5s)
 - **example_binary_sensor_radar**: Radar config in `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`
   - Debug switches: `RADAR_GATE_DATA_ENABLE` (gate data) / `RADAR_DEBUG_COUNTER_ENABLE` (counter)
+- **example_radar_rd03d**: Rd-03D_V2 multi-target radar config in `example_radar_rd03d/example_radar_rd03d/app_config.h`
+  - UART: TX=GPIO4, RX=GPIO5, 256000bps (console UART0 GPIO16/7 must stay free)
+  - Push throttle: `interval = clamp(PUSH_MAX_MS/(1+|speed|), PUSH_MIN_MS, PUSH_MAX_MS)` ms
+    (250~5000ms by default, one message per target; disappearing targets are polled, not pushed)
 
 ## Dependencies
 

@@ -95,8 +95,14 @@ xTaskCreate(ha_tcp_server_start, "tcp_json", TCP_SERVER_STACK, (void *)&ha_dev, 
 ```
 Request: {"cmd":"get_device"}
 Response: {"mac":"XX:XX:XX:XX:XX:XX","name":"...","model":"...","sw_version":"...",
-           "entities":[{"id":"...","type":"...","name":"...","icon":"..."}]}
+           "entities":[{"id":"...","type":"...","name":"...","icon":"..."}],
+           "offline_timeout":300}
 ```
+
+Optional field `offline_timeout` (seconds): device-reported offline timeout, filled in by
+each device's `get_device` callback (e.g. the temp/humidity sensor reports `300` only when
+push is configured). When HA receives `>0` it enters push-only mode: no polling, entities
+become unavailable if no push arrives within this timeout; `0`/absent keeps poll mode.
 
 ### get_state — Return Entity States
 

@@ -119,14 +119,15 @@ int DHT20_Read(float *temperature, float *humidity)
         raw_temp += buf[5];
         *temperature = raw_temp * 1.9073486328125e-4f - 50.0f;
 
-        if (*humidity > 100.0f || *temperature < -40.0f || *temperature > 80.0f) {
+        if (*humidity > 100.0f || *humidity < 0.1f ||
+            *temperature < -40.0f || *temperature > 80.0f) {
             blog_error("[DHT20] invalid data: temp=%.1f hum=%.1f raw=0x%05X",
                        *temperature, *humidity, raw_hum);
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;
         }
 
-        if (raw_hum == 0 && raw_temp == 0) {
+        if (raw_hum == 0 || raw_temp == 0) {
             blog_error("[DHT20] zero raw data detected, sensor may be unresponsive");
             vTaskDelay(pdMS_TO_TICKS(20));
             continue;

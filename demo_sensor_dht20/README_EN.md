@@ -40,8 +40,13 @@ Response:
  "entities":[
    {"id":"ACD8297A605D_001","type":"sensor","name":"Temperature","icon":"mdi:thermometer","device_class":"temperature","unit":"°C"},
    {"id":"ACD8297A605D_002","type":"sensor","name":"Humidity","icon":"mdi:water-percent","device_class":"humidity","unit":"%"}
- ]}
+ ],
+ "offline_timeout":300}
 ```
+
+`offline_timeout` (seconds): reports `300` only when a push target is configured, otherwise `0`.
+When HA receives `>0` it enters **push-only mode** (no polling) and marks entities unavailable
+if no push arrives within this timeout.
 
 ### Get State
 
@@ -59,7 +64,9 @@ Response:
 
 ### Push
 
-Device reads DHT20 every 5 seconds and automatically pushes to HA's port 9101 when temperature or humidity changes ≥0.1:
+Device reads DHT20 every 5 seconds and pushes to HA's port 9101 when temperature or
+humidity changes ≥0.1; it also forces a heartbeat push every 60 seconds (even if values
+are unchanged) so HA does not falsely mark the device offline:
 ```json
 {"entities":[
   {"id":"ACD8297A605D_001","type":"sensor","value":29.5},
@@ -85,6 +92,8 @@ All configuration in `demo_sensor_dht20/demo_sensor_dht20/app_config.h`:
 #define DHT20_I2C_FREQ          100000
 
 #define SENSOR_READ_INTERVAL_MS  5000
+#define DEVICE_OFFLINE_TIMEOUT   300   // Offline timeout reported to HA (seconds), only when push is configured
+#define PUSH_HEARTBEAT_MS        60000 // Push heartbeat (milliseconds)
 
 #define TCP_SERVER_PORT    9100
 #define DEVICE_TYPE        "sensor"

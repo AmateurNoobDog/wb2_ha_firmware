@@ -9,6 +9,15 @@
 // Sensor read interval
 #define SENSOR_READ_INTERVAL_MS  5000
 
+// Push-only mode: reported to HA via get_device when push is configured.
+// HA stops polling and marks entities unavailable after this many seconds
+// without a push. 0 disables push-only mode (HA keeps polling).
+#define DEVICE_OFFLINE_TIMEOUT   300
+
+// Force a push at least this often even when values are unchanged,
+// so HA does not falsely mark the device offline. Must be << DEVICE_OFFLINE_TIMEOUT.
+#define PUSH_HEARTBEAT_MS        60000
+
 // TCP server
 #define TCP_SERVER_PORT    9100
 #define TCP_SERVER_STACK   4096

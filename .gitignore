@@ -6,3 +6,4 @@ __pycache__
 *.swp
 *.tmp
 *.Zone.Identifier
+*:Zone.Identifier

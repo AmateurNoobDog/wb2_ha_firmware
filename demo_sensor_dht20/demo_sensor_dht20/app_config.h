@@ -27,7 +27,7 @@
 #define DEVICE_NAME         "温湿度传感器"
 #define DEVICE_MODEL        "Ai-WB2/DHT20"
 #define DEVICE_MANUFACTURER "AND-DIY"
-#define DEVICE_SW_VERSION   "1.1.0"
+#define DEVICE_SW_VERSION   "1.2.0"
 
 // WiFi provisioning
 #define STORE_KEY_SSID     "ROUTER_SSID"

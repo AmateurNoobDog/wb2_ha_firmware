@@ -16,7 +16,7 @@
 #define DEVICE_NAME        "\xE8\xAF\xAD\xE9\x9F\xB3\xE5\x90\x88\xE6\x88\x90"
 #define DEVICE_MODEL       "Ai-WB2-TW-TTS"
 #define DEVICE_MANUFACTURER "AND-DIY"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 
 #define TTS_ENTITY_NOTIFY   "001"
 #define TTS_ENTITY_VOLUME   "002"

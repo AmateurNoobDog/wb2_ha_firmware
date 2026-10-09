@@ -52,7 +52,7 @@
 #define DEVICE_NAME             "毫米波雷达"
 #define DEVICE_MODEL            "Rd-03D_V2"
 #define DEVICE_MANUFACTURER     "Ai-Thinker"
-#define DEVICE_SW_VERSION       "1.1.0"
+#define DEVICE_SW_VERSION       "1.2.0"
 
 /*--------------------- WiFi 配网 / 持久化 ---------------------*/
 #define STORE_KEY_SSID          "ROUTER_SSID"

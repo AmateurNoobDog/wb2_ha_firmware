@@ -6,7 +6,7 @@ Firmware for Ai-WB2 (BL602) + Ai-Thinker Rd-03D_V2 24GHz mmWave radar, with WiFi
 BLE BluFi provisioning and TCP JSON reporting, to bring multi-target coordinates
 and speed into Home Assistant.
 
-**Current version: 1.1.0**
+**Current version: 1.2.0**
 
 ## Hardware
 
@@ -61,7 +61,7 @@ Port: **9100**
 Response:
 ```json
 {"mac":"AC:D8:29:7A:60:5D","name":"毫米波雷达","model":"Rd-03D_V2",
- "manufacturer":"Ai-Thinker","sw_version":"1.1.0",
+ "manufacturer":"Ai-Thinker","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"有人","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"sensor","name":"目标1 X","icon":"mdi:axis-x-light","unit":"mm"},

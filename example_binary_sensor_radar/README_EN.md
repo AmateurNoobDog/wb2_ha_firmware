@@ -6,7 +6,7 @@ Human presence detection firmware based on Ai-Thinker RD-01 module (BL602 + rada
 The firmware runs on the BL602 inside the module, communicating with the radar chip via SPI/I2C/UART,
 reporting motion/presence status to Home Assistant via WiFi + TCP JSON.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -63,7 +63,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Radar","model":"RD-01","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Radar","model":"RD-01","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"Motion Detection","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"binary_sensor","name":"Presence Detection","icon":"mdi:human-greeting"},
@@ -163,7 +163,7 @@ All configuration in `example_binary_sensor_radar/example_binary_sensor_radar/ap
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "Radar"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 
 // Push configuration
 #define HA_PUSH_DEFAULT_PORT  9101    // HA push listening port

@@ -4,7 +4,7 @@
 
 基于 Ai-WB2（BL602）+ DHT20 温湿度传感器的固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 上报。
 
-**当前版本: 1.1.0**
+**当前版本: 1.2.0**
 
 ## 硬件连接
 
@@ -36,7 +36,7 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"温湿度传感器","model":"Ai-WB2/DHT20","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"温湿度传感器","model":"Ai-WB2/DHT20","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"sensor","name":"温度","icon":"mdi:thermometer","device_class":"temperature","unit":"°C"},
    {"id":"ACD8297A605D_002","type":"sensor","name":"湿度","icon":"mdi:water-percent","device_class":"humidity","unit":"%"}
@@ -97,7 +97,7 @@ make -j4
 #define DEVICE_TYPE        "sensor"
 #define DEVICE_NAME        "温湿度传感器"
 #define DEVICE_MODEL       "Ai-WB2/DHT20"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 ```
 
 ## 配网

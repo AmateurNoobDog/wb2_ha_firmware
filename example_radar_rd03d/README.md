@@ -5,7 +5,7 @@
 基于 Ai-WB2（BL602）+ 安信可 Rd-03D_V2 24GHz 毫米波雷达的固件，支持 WiFi + BLE BluFi
 配网 + TCP JSON 上报，可将雷达的多目标坐标/速度接入 Home Assistant。
 
-**当前版本: 1.1.0**
+**当前版本: 1.2.0**
 
 ## 硬件连接
 
@@ -56,7 +56,7 @@
 响应：
 ```json
 {"mac":"AC:D8:29:7A:60:5D","name":"毫米波雷达","model":"Rd-03D_V2",
- "manufacturer":"Ai-Thinker","sw_version":"1.1.0",
+ "manufacturer":"Ai-Thinker","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"有人","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"sensor","name":"目标1 X","icon":"mdi:axis-x-light","unit":"mm"},

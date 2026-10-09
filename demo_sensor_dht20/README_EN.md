@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 Temperature & humidity sensor firmware based on Ai-WB2 (BL602) + DHT20, supports WiFi + BLE BluFi provisioning + TCP JSON reporting.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -36,7 +36,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Temperature & Humidity Sensor","model":"Ai-WB2/DHT20","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Temperature & Humidity Sensor","model":"Ai-WB2/DHT20","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"sensor","name":"Temperature","icon":"mdi:thermometer","device_class":"temperature","unit":"°C"},
    {"id":"ACD8297A605D_002","type":"sensor","name":"Humidity","icon":"mdi:water-percent","device_class":"humidity","unit":"%"}
@@ -99,7 +99,7 @@ All configuration in `demo_sensor_dht20/demo_sensor_dht20/app_config.h`:
 #define DEVICE_TYPE        "sensor"
 #define DEVICE_NAME        "Temperature & Humidity Sensor"
 #define DEVICE_MODEL       "Ai-WB2/DHT20"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 ```
 
 ## Provisioning

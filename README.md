@@ -6,7 +6,7 @@
 设备通过 WiFi 接入局域网，使用轻量 TCP JSON 协议与 Home Assistant 集成
 （配套集成见 [`and_home`](https://gitee.com/AmateurNoobDog/and_home)）。
 
-**当前版本: 1.1.0**
+**当前版本: 1.2.0**
 
 ## 项目结构
 
@@ -104,7 +104,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（开关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"开关1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"开关2","icon":"mdi:toggle-switch"},
@@ -114,7 +114,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（433 网关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"配对","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"重置","icon":"mdi:restore","action":"reset"},

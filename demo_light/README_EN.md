@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 RGB color light firmware based on Ai-WB2 (BL602), supports WiFi + BLE BluFi provisioning + TCP JSON control.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -41,7 +41,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Color Light","model":"Ai-WB2-12F","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Color Light","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"light","name":"Color Light","icon":"mdi:lightbulb"}
  ]}
@@ -101,5 +101,5 @@ All configuration in `demo_light/demo_light/app_config.h`:
 #define DEVICE_TYPE        "light"
 #define DEVICE_NAME        "Color Light"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 ```

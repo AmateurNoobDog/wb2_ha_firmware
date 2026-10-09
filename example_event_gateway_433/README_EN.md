@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 433MHz remote receiver gateway firmware, supports WiFi + BLE BluFi provisioning + TCP JSON control + Push reporting.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -36,7 +36,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"7C:B9:4C:D1:F7:67","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.1.0",
+{"mac":"7C:B9:4C:D1:F7:67","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"7CB94CD1F767_001","type":"button","name":"Pair","icon":"mdi:remote","action":"pair"},
    {"id":"7CB94CD1F767_002","type":"button","name":"Reset","icon":"mdi:restore","action":"reset"},
@@ -96,7 +96,7 @@ All configuration in `example_event_gateway_433/example_event_gateway_433/app_co
 #define DEVICE_TYPE        "event"
 #define DEVICE_NAME        "433 Gateway"
 #define DEVICE_MODEL       "Ai-WB2-12F"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 #define HA_PUSH_DEFAULT_PORT  9101
 ```
 

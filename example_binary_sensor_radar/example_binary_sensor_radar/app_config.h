@@ -14,7 +14,7 @@
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
 #define DEVICE_MANUFACTURER   "AND-DIY"
-#define DEVICE_SW_VERSION     "1.1.0"
+#define DEVICE_SW_VERSION     "1.2.0"
 
 // Reboot provisioning detection
 #define REBOOT_PROVISION_COUNT  3

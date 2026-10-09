@@ -4,7 +4,7 @@
 
 基于 Ai-WB2（BL602）+ 外部 TTS 语音合成模块的固件，支持 WiFi + BLE BluFi 配网 + TCP JSON 控制。
 
-**当前版本: 1.1.0**
+**当前版本: 1.2.0**
 
 ## 硬件连接
 
@@ -37,7 +37,7 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"语音合成","model":"Ai-WB2-TW-TTS","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"语音合成","model":"Ai-WB2-TW-TTS","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"notify","name":"TTS","icon":"mdi:speaker-message"},
    {"id":"ACD8297A605D_002","type":"number","name":"音量","icon":"mdi:volume-high","min":0,"max":9,"step":1},
@@ -98,7 +98,7 @@ make -j4
 #define DEVICE_TYPE        "tts"
 #define DEVICE_NAME        "语音合成"
 #define DEVICE_MODEL       "Ai-WB2-TW-TTS"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 
 #define TTS_VOLUME_MIN      0
 #define TTS_VOLUME_MAX      9

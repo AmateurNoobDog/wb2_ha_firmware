@@ -6,7 +6,7 @@ Smart home application firmware based on [Ai-Thinker-WB2 (BL602)](https://gitee.
 Devices connect to the local network via WiFi and integrate with Home Assistant using a lightweight TCP JSON protocol
 (companion integration: [`and_home`](https://gitee.com/AmateurNoobDog/and_home)).
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Project Structure
 
@@ -104,7 +104,7 @@ Request/response are single-line JSON, separated by `\n`.
 
 Response example (switch):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"Switch 1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"Switch 2","icon":"mdi:toggle-switch"},
@@ -114,7 +114,7 @@ Response example (switch):
 
 Response example (433 gateway):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.0.1",
+{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"Pair","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"Reset","icon":"mdi:restore","action":"reset"},

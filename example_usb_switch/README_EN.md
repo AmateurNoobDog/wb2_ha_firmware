@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 Single-channel USB power switch firmware based on Ai-WB2 (BL602), supports WiFi + BLE BluFi provisioning + TCP JSON control.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -39,7 +39,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"7C:B9:4C:D4:5B:0B","name":"USB Power Switch","model":"Ai-WB2-01S","sw_version":"1.1.0",
+{"mac":"7C:B9:4C:D4:5B:0B","name":"USB Power Switch","model":"Ai-WB2-01S","sw_version":"1.2.0",
  "entities":[
    {"id":"7CB94CD45B0B_001","type":"switch","name":"USB","icon":"mdi:toggle-switch"}
  ]}
@@ -96,7 +96,7 @@ All configuration in `example_usb_switch/example_usb_switch/app_config.h`:
 #define DEVICE_TYPE        "switch"
 #define DEVICE_NAME        "USB Power Switch"
 #define DEVICE_MODEL       "Ai-WB2-01S"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 ```
 
 ## Provisioning

@@ -16,7 +16,7 @@
 #define DEVICE_NAME        "彩灯"
 #define DEVICE_MODEL       "Ai-WB2-12F"
 #define DEVICE_MANUFACTURER "AND-DIY"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 
 #define STORE_KEY_SSID     "ROUTER_SSID"
 #define STORE_KEY_PWD      "ROUTER_PWD"

@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 Text-to-speech firmware based on Ai-WB2 (BL602) + external TTS module, supports WiFi + BLE BluFi provisioning + TCP JSON control.
 
-**Current Version: 1.1.0**
+**Current Version: 1.2.0**
 
 ## Hardware Connections
 
@@ -37,7 +37,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Text-to-Speech","model":"Ai-WB2-TW-TTS","sw_version":"1.1.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Text-to-Speech","model":"Ai-WB2-TW-TTS","sw_version":"1.2.0",
  "entities":[
    {"id":"ACD8297A605D_001","type":"notify","name":"TTS","icon":"mdi:speaker-message"},
    {"id":"ACD8297A605D_002","type":"number","name":"Volume","icon":"mdi:volume-high","min":0,"max":9,"step":1},
@@ -98,7 +98,7 @@ All configuration in `example_notify_tts/example_notify_tts/app_config.h`:
 #define DEVICE_TYPE        "tts"
 #define DEVICE_NAME        "Text-to-Speech"
 #define DEVICE_MODEL       "Ai-WB2-TW-TTS"
-#define DEVICE_SW_VERSION  "1.1.0"
+#define DEVICE_SW_VERSION  "1.2.0"
 
 #define TTS_VOLUME_MIN      0
 #define TTS_VOLUME_MAX      9

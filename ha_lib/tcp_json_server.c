@@ -10,8 +10,16 @@
 #include "ha_json.h"
 #include "wifi_mgmr_ext.h"
 
-#define BUF_LEN         256
+/* 请求行缓冲：单行 JSON 上限。原值 256 会把超长 text 静默截断，
+ * 导致 cJSON 解析失败、整条指令被丢弃（TTS 不出声）。768 可容纳
+ * 约 700 字节文本（UTF-8 汉字 3B/字 ≈ 230 字）。 */
+#define BUF_LEN         768
 #define RECV_TIMEOUT_MS 5000
+
+/* Response buffers must hold the largest entity list of any project.
+ * example_radar_rd03d reports 11 entities (~1.2 KB of device JSON). */
+#define RESP_LINE_LEN   1792
+#define RESP_DEV_LEN    1536
 
 static const ha_device_t *s_dev;
 
@@ -32,8 +40,8 @@ static void tcp_log(const char *fmt, ...)
 static void respond_device(struct netconn *conn)
 {
     uint8_t mac[6];
-    char line[768];
-    char dev[640];
+    char line[RESP_LINE_LEN];
+    char dev[RESP_DEV_LEN];
     int n;
 
     if (s_dev->get_device == NULL || s_dev->get_device(dev, sizeof(dev)) < 0) {
@@ -50,6 +58,9 @@ static void respond_device(struct netconn *conn)
                  s_dev->name, s_dev->model,
                  s_dev->manufacturer ? s_dev->manufacturer : "",
                  s_dev->sw_version, dev);
+    if (n > (int)sizeof(line) - 1) {
+        n = (int)sizeof(line) - 1;          /* never send past the buffer */
+    }
     netconn_write(conn, line, n, NETCONN_NOCOPY);
     netconn_write(conn, "\r\n", 2, NETCONN_NOCOPY);
     tcp_log("[TCP] send get_device: %s", line);
@@ -57,8 +68,8 @@ static void respond_device(struct netconn *conn)
 
 static void respond_state(struct netconn *conn)
 {
-    char line[768];
-    char dev[640];
+    char line[RESP_LINE_LEN];
+    char dev[RESP_DEV_LEN];
     int n;
 
     if (s_dev->get_state == NULL || s_dev->get_state(dev, sizeof(dev)) < 0) {
@@ -66,6 +77,9 @@ static void respond_state(struct netconn *conn)
     }
     n = snprintf(line, sizeof(line), "{\"state\":\"online\"%s%s}",
                  dev[0] ? "," : "", dev);
+    if (n > (int)sizeof(line) - 1) {
+        n = (int)sizeof(line) - 1;          /* never send past the buffer */
+    }
     netconn_write(conn, line, n, NETCONN_NOCOPY);
     netconn_write(conn, "\r\n", 2, NETCONN_NOCOPY);
     tcp_log("[TCP] send get_state: %s", line);

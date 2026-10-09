@@ -7,7 +7,8 @@
 
 const char *ha_json_str(const char *buf, const char *key)
 {
-    static char s_buf[128];
+    /* 必须 >= tcp_json_server 的 BUF_LEN(768)，否则长字段值被静默截断 */
+    static char s_buf[768];
     cJSON *root = cJSON_Parse(buf);
     if (!root) {
         return NULL;

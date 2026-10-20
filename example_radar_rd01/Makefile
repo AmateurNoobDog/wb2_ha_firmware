@@ -4,7 +4,7 @@
 # WiFi STA + blufi provisioning + TCP JSON server (port 9100).
 #
 
-PROJECT_NAME := example_binary_sensor_radar
+PROJECT_NAME := example_radar_rd01
 PROJECT_PATH := $(abspath .)
 PROJECT_BOARD := evb
 export PROJECT_PATH PROJECT_BOARD

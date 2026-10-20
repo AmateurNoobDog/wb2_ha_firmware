@@ -6,7 +6,7 @@ Smart home application firmware based on [Ai-Thinker-WB2 (BL602)](https://gitee.
 Devices connect to the local network via WiFi and integrate with Home Assistant using a lightweight TCP JSON protocol
 (companion integration: [`and_home`](https://gitee.com/AmateurNoobDog/and_home)).
 
-**Current Version: 1.2.0**
+**Current Version: 1.2.1**
 
 ## Project Structure
 
@@ -19,7 +19,7 @@ applications/home_assistant/
 ├── demo_sensor_dht20/            # [Dev Board] Temperature & humidity sensor (Ai-WB2-12F-Kit + DHT20, I2C)
 ├── example_usb_switch/           # [Module] Single-channel USB power switch (Ai-WB2-01S, IO4 active low)
 ├── example_event_gateway_433/    # [Module] 433MHz remote control gateway (Ai-WB2-12F + R1A, UART1 receiver)
-├── example_binary_sensor_radar/  # [Module] Radar presence detection (RD-01, SPI + UART)
+├── example_radar_rd01/  # [Module] Radar presence detection (RD-01, SPI + UART)
 ├── example_radar_rd03d/          # [Module] Multi-target mmWave radar (Rd-03D_V2, UART1 256000bps)
 └── example_notify_tts/           # [Module] Text-to-speech (Ai-WB2-12F + TW-TTS, UART)
 ```
@@ -55,7 +55,7 @@ git clone https://gitee.com/AmateurNoobDog/wb2_ha_firmware.git home_assistant
 Requires complete SDK environment (BL60X_SDK_PATH pointing to SDK root directory, including riscv toolchain):
 
 ```bash
-cd applications/home_assistant/demo_switch   # or demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_radar_rd03d, example_notify_tts
+cd applications/home_assistant/demo_switch   # or demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_radar_rd01, example_radar_rd03d, example_notify_tts
 make -j4
 # Output: build_out/demo_switch.bin
 ```
@@ -104,7 +104,7 @@ Request/response are single-line JSON, separated by `\n`.
 
 Response example (switch):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Smart Switch","model":"Ai-WB2-12F","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"Switch 1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"Switch 2","icon":"mdi:toggle-switch"},
@@ -114,7 +114,7 @@ Response example (switch):
 
 Response example (433 gateway):
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"433 Gateway","model":"Ai-WB2-12F","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"Pair","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"Reset","icon":"mdi:restore","action":"reset"},
@@ -217,7 +217,7 @@ Home Assistant automatically discovers devices on the local network via zeroconf
   (UART1 TTS: TX=GPIO4, RX=GPIO11, 9600bps; volume/speed range 0-9)
 - **demo_sensor_dht20**: Temperature & humidity sensor config in `demo_sensor_dht20/demo_sensor_dht20/app_config.h`
   (I2C: SCL=IO12, SDA=IO3, 100kHz; report interval 5s)
-- **example_binary_sensor_radar**: Radar config in `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`
+- **example_radar_rd01**: Radar config in `example_radar_rd01/example_radar_rd01/app_config.h`
   - Debug switches: `RADAR_GATE_DATA_ENABLE` (gate data) / `RADAR_DEBUG_COUNTER_ENABLE` (counter)
 - **example_radar_rd03d**: Rd-03D_V2 multi-target radar config in `example_radar_rd03d/example_radar_rd03d/app_config.h`
   - UART: TX=GPIO4, RX=GPIO5, 256000bps (console UART0 GPIO16/7 must stay free)

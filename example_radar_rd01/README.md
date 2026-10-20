@@ -1,12 +1,12 @@
 [English](README_EN.md) | 中文
 
-# example_binary_sensor_radar — 雷达存在检测固件
+# example_radar_rd01 — 雷达存在检测固件
 
 基于 Ai-Thinker RD-01 模组(BL602 + 雷达芯片一体)的人体存在检测固件。
 固件运行在模组内的 BL602 上,通过 SPI/I2C/UART 与模组内的雷达芯片通信,
 通过 WiFi + TCP JSON 上报运动/存在状态到 Home Assistant。
 
-**当前版本: 1.2.0**
+**当前版本: 1.2.1**
 
 ## 硬件连接
 
@@ -63,7 +63,7 @@
 
 响应：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"雷达","model":"RD-01","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"运动检测","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"binary_sensor","name":"存在检测","icon":"mdi:human-greeting"},
@@ -144,14 +144,14 @@
 ## 编译
 
 ```bash
-cd applications/home_assistant/example_binary_sensor_radar
+cd applications/home_assistant/example_radar_rd01
 make -j6
-# 产物: build_out/example_binary_sensor_radar.bin (~589K)
+# 产物: build_out/example_radar_rd01.bin (~589K)
 ```
 
 ## 配置
 
-所有配置在 `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`:
+所有配置在 `example_radar_rd01/example_radar_rd01/app_config.h`:
 
 ```c
 // RD-01 模组硬件(内部接口)
@@ -163,7 +163,7 @@ make -j6
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "雷达"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION  "1.2.0"
+#define DEVICE_SW_VERSION  "1.2.1"
 
 // 推送配置
 #define HA_PUSH_DEFAULT_PORT  9101    // HA 推送监听端口

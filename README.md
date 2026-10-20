@@ -6,7 +6,7 @@
 设备通过 WiFi 接入局域网，使用轻量 TCP JSON 协议与 Home Assistant 集成
 （配套集成见 [`and_home`](https://gitee.com/AmateurNoobDog/and_home)）。
 
-**当前版本: 1.2.0**
+**当前版本: 1.2.1**
 
 ## 项目结构
 
@@ -19,7 +19,7 @@ applications/home_assistant/
 ├── demo_sensor_dht20/            # 【开发板】温湿度传感器（Ai-WB2-12F-Kit + DHT20，I2C）
 ├── example_usb_switch/           # 【模组】单路 USB 通断器（Ai-WB2-01S，IO4 低电平开启）
 ├── example_event_gateway_433/    # 【模组】433 遥控网关（Ai-WB2-12F + R1A，UART1 接收）
-├── example_binary_sensor_radar/  # 【模组】雷达存在检测（RD-01，SPI + UART）
+├── example_radar_rd01/  # 【模组】雷达存在检测（RD-01，SPI + UART）
 ├── example_radar_rd03d/          # 【模组】毫米波雷达多目标（Rd-03D_V2，UART1 256000bps）
 └── example_notify_tts/           # 【模组】语音合成（Ai-WB2-12F + TW-TTS，UART）
 ```
@@ -55,7 +55,7 @@ git clone https://gitee.com/AmateurNoobDog/wb2_ha_firmware.git home_assistant
 需要完整 SDK 环境（BL60X_SDK_PATH 指向 SDK 根目录，含 riscv 工具链）：
 
 ```bash
-cd applications/home_assistant/demo_switch   # 或 demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_binary_sensor_radar, example_radar_rd03d, example_notify_tts
+cd applications/home_assistant/demo_switch   # 或 demo_light, demo_sensor_dht20, example_usb_switch, example_event_gateway_433, example_radar_rd01, example_radar_rd03d, example_notify_tts
 make -j4
 # 产物: build_out/demo_switch.bin
 ```
@@ -104,7 +104,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（开关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"智能开关","model":"Ai-WB2-12F","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"switch","name":"开关1","icon":"mdi:toggle-switch"},
    {"id":"ACD8297A605D_002","type":"switch","name":"开关2","icon":"mdi:toggle-switch"},
@@ -114,7 +114,7 @@ WiFi 凭据通过 EasyFlash 持久化（`store.c`），可用 CLI 命令 `cfg_cl
 
 响应示例（433 网关）：
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"433网关","model":"Ai-WB2-12F","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"button","name":"配对","icon":"mdi:remote","action":"pair"},
    {"id":"ACD8297A605D_002","type":"button","name":"重置","icon":"mdi:restore","action":"reset"},
@@ -216,7 +216,7 @@ Home Assistant 通过 zeroconf 自动发现局域网内的设备。
   （UART1 TTS: TX=GPIO4, RX=GPIO11, 9600bps; 音量/语速范围 0-9）
 - **demo_sensor_dht20**: 温湿度传感器配置见 `demo_sensor_dht20/demo_sensor_dht20/app_config.h`
   （I2C: SCL=IO12, SDA=IO3, 100kHz; 上报间隔 5s; 心跳 60s; 掉线上报 300s）
-- **example_binary_sensor_radar**: 雷达配置见 `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`
+- **example_radar_rd01**: 雷达配置见 `example_radar_rd01/example_radar_rd01/app_config.h`
   - 调试开关：`RADAR_GATE_DATA_ENABLE`（门数据）/ `RADAR_DEBUG_COUNTER_ENABLE`（计数器）
 - **example_radar_rd03d**: Rd-03D_V2 多目标雷达配置见 `example_radar_rd03d/example_radar_rd03d/app_config.h`
   - 串口：UART1 TX=GPIO4, RX=GPIO5, 256000bps（日志口 UART0 GPIO16/7 不可占用）

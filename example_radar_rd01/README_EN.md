@@ -1,12 +1,12 @@
 English | [中文](README.md)
 
-# example_binary_sensor_radar — Radar Presence Detection Firmware
+# example_radar_rd01 — Radar Presence Detection Firmware
 
 Human presence detection firmware based on Ai-Thinker RD-01 module (BL602 + radar chip integrated).
 The firmware runs on the BL602 inside the module, communicating with the radar chip via SPI/I2C/UART,
 reporting motion/presence status to Home Assistant via WiFi + TCP JSON.
 
-**Current Version: 1.2.0**
+**Current Version: 1.2.1**
 
 ## Hardware Connections
 
@@ -63,7 +63,7 @@ Port: **9100**
 
 Response:
 ```json
-{"mac":"AC:D8:29:7A:60:5D","name":"Radar","model":"RD-01","sw_version":"1.2.0",
+{"mac":"AC:D8:29:7A:60:5D","name":"Radar","model":"RD-01","sw_version":"1.2.1",
  "entities":[
    {"id":"ACD8297A605D_001","type":"binary_sensor","name":"Motion Detection","icon":"mdi:motion-sensor"},
    {"id":"ACD8297A605D_002","type":"binary_sensor","name":"Presence Detection","icon":"mdi:human-greeting"},
@@ -144,14 +144,14 @@ When `RADAR_DEBUG_COUNTER_ENABLE=1` (without gate data):
 ## Build
 
 ```bash
-cd applications/home_assistant/example_binary_sensor_radar
+cd applications/home_assistant/example_radar_rd01
 make -j6
-# Output: build_out/example_binary_sensor_radar.bin (~589K)
+# Output: build_out/example_radar_rd01.bin (~589K)
 ```
 
 ## Configuration
 
-All configuration in `example_binary_sensor_radar/example_binary_sensor_radar/app_config.h`:
+All configuration in `example_radar_rd01/example_radar_rd01/app_config.h`:
 
 ```c
 // RD-01 module hardware (internal interface)
@@ -163,7 +163,7 @@ All configuration in `example_binary_sensor_radar/example_binary_sensor_radar/ap
 #define DEVICE_TYPE           "radar"
 #define DEVICE_NAME           "Radar"
 #define DEVICE_MODEL          "RD-01"
-#define DEVICE_SW_VERSION  "1.2.0"
+#define DEVICE_SW_VERSION  "1.2.1"
 
 // Push configuration
 #define HA_PUSH_DEFAULT_PORT  9101    // HA push listening port

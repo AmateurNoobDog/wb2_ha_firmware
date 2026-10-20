@@ -60,4 +60,4 @@ CONFIG_MBEDTLS_SHA1_USE_HW:=1
 CONFIG_MBEDTLS_SHA256_USE_HW:=1
 
 #blog enable components
-LOG_ENABLED_COMPONENTS:=example_binary_sensor_radar ha_lib D103
+LOG_ENABLED_COMPONENTS:=example_radar_rd01 ha_lib D103
